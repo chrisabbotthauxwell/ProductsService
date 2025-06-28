@@ -8,10 +8,10 @@ USER app
 FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG configuration=Release
 WORKDIR /src
-COPY ["ProductsService/ProductsService/ProductsService.csproj", "ProductsService/ProductsService/"]
-RUN dotnet restore "ProductsService/ProductsService/ProductsService.csproj"
+COPY ["ProductsService/ProductsService.csproj", "ProductsService/"]
+RUN dotnet restore "ProductsService/ProductsService.csproj"
 COPY . .
-WORKDIR "/src/ProductsService/ProductsService"
+WORKDIR "/src/ProductsService"
 RUN dotnet build "ProductsService.csproj" -c $configuration -o /app/build
 
 FROM build AS publish
