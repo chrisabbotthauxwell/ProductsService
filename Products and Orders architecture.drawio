@@ -1,6 +1,6 @@
 <mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36 Edg/138.0.0.0" version="27.1.6">
   <diagram name="Page-1" id="efFxyUT-cCq1GbkwmHIr">
-    <mxGraphModel dx="2421" dy="1405" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+    <mxGraphModel dx="1715" dy="995" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -81,11 +81,22 @@
         <mxCell id="wUseijk_yUNnYl662s6i-58" value="Developer" style="image;aspect=fixed;html=1;points=[];align=center;fontSize=12;image=img/lib/azure2/identity/Users.svg;" vertex="1" parent="1">
           <mxGeometry x="198" y="435" width="64" height="70" as="geometry" />
         </mxCell>
+        <mxCell id="wUseijk_yUNnYl662s6i-69" value="push image" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.035;entryY=0.508;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="wUseijk_yUNnYl662s6i-59" target="wUseijk_yUNnYl662s6i-56">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="400" y="410" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
         <mxCell id="wUseijk_yUNnYl662s6i-59" value="" style="sketch=0;pointerEvents=1;shadow=0;dashed=0;html=1;strokeColor=none;fillColor=#505050;labelPosition=center;verticalLabelPosition=bottom;verticalAlign=top;outlineConnect=0;align=center;shape=mxgraph.office.devices.workstation_visual_studio;" vertex="1" parent="1">
           <mxGeometry x="203.5" y="361.5" width="53" height="59" as="geometry" />
         </mxCell>
+        <mxCell id="wUseijk_yUNnYl662s6i-70" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;startArrow=classic;startFill=1;" edge="1" parent="1" target="wUseijk_yUNnYl662s6i-59">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="130" y="390" as="sourcePoint" />
+            <mxPoint x="206" y="395" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
         <mxCell id="wUseijk_yUNnYl662s6i-60" value="Source control" style="shape=image;html=1;verticalAlign=top;verticalLabelPosition=bottom;labelBackgroundColor=#ffffff;imageAspect=0;aspect=fixed;image=https://cdn4.iconfinder.com/data/icons/ionicons/512/icon-social-github-128.png" vertex="1" parent="1">
-          <mxGeometry x="90" y="367" width="68" height="68" as="geometry" />
+          <mxGeometry x="60" y="361.5" width="68" height="68" as="geometry" />
         </mxCell>
         <mxCell id="wUseijk_yUNnYl662s6i-61" value="Customer" style="image;aspect=fixed;html=1;points=[];align=center;fontSize=12;image=img/lib/azure2/identity/Users.svg;" vertex="1" parent="1">
           <mxGeometry x="1223.07" y="80" width="64" height="70" as="geometry" />
@@ -93,7 +104,7 @@
         <mxCell id="wUseijk_yUNnYl662s6i-62" value="Warehouse&lt;div&gt;Manager&lt;/div&gt;" style="image;aspect=fixed;html=1;points=[];align=center;fontSize=12;image=img/lib/azure2/identity/Users.svg;" vertex="1" parent="1">
           <mxGeometry x="728" y="80" width="64" height="70" as="geometry" />
         </mxCell>
-        <mxCell id="wUseijk_yUNnYl662s6i-66" value="place order" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="wUseijk_yUNnYl662s6i-64" target="wUseijk_yUNnYl662s6i-42">
+        <mxCell id="wUseijk_yUNnYl662s6i-66" value="place order&lt;div&gt;for product&lt;/div&gt;" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="wUseijk_yUNnYl662s6i-64" target="wUseijk_yUNnYl662s6i-42">
           <mxGeometry relative="1" as="geometry">
             <Array as="points">
               <mxPoint x="1310" y="325" />
@@ -102,7 +113,7 @@
           </mxGeometry>
         </mxCell>
         <mxCell id="wUseijk_yUNnYl662s6i-64" value="Storefront UI [Not produced]" style="rounded=0;whiteSpace=wrap;html=1;sketch=1;curveFitting=1;jiggle=2;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
-          <mxGeometry x="1000.0699999999999" y="200" width="510" height="60" as="geometry" />
+          <mxGeometry x="1030" y="200" width="480.07" height="60" as="geometry" />
         </mxCell>
         <mxCell id="wUseijk_yUNnYl662s6i-65" value="get products" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;" edge="1" parent="1" source="wUseijk_yUNnYl662s6i-40">
           <mxGeometry relative="1" as="geometry">
@@ -115,9 +126,9 @@
           </mxGeometry>
         </mxCell>
         <mxCell id="wUseijk_yUNnYl662s6i-67" value="Back office UI [Not produced]" style="rounded=0;whiteSpace=wrap;html=1;sketch=1;curveFitting=1;jiggle=2;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
-          <mxGeometry x="530" y="200" width="460" height="60" as="geometry" />
+          <mxGeometry x="530" y="200" width="480" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="wUseijk_yUNnYl662s6i-68" value="update stock" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="wUseijk_yUNnYl662s6i-67" target="wUseijk_yUNnYl662s6i-40">
+        <mxCell id="wUseijk_yUNnYl662s6i-68" value="update stock&lt;div&gt;for product&lt;/div&gt;" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="wUseijk_yUNnYl662s6i-67" target="wUseijk_yUNnYl662s6i-40">
           <mxGeometry relative="1" as="geometry">
             <mxPoint x="760" y="390" as="targetPoint" />
             <Array as="points">
