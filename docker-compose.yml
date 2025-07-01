@@ -1,0 +1,47 @@
+version: '3.8'
+
+services:
+  productsservice:
+    build:
+      context: .
+      dockerfile: ProductsService/Dockerfile
+    container_name: productsservice
+    ports:
+      - "8080:8080"  # Your app's exposed port
+    networks:
+      - dapr-net
+
+  dapr-products:
+    image: "daprio/daprd:latest"
+    container_name: dapr-products
+    entrypoint: ["/daprd"]
+    ports:
+      - "50001:50001"  # Dapr gRPC port
+    depends_on:
+      - productsservice
+      - redis
+    restart: on-failure
+    command: [
+      #"/daprd",
+      "-app-id", "productsservice",
+      "-app-port", "8080",
+      "-dapr-http-port", "3500",
+      "-dapr-grpc-port", "50001",
+      "-components-path", "/components",
+      "-app-health-check-path", "/healthz"
+    ]
+    volumes:
+      - ./components:/components
+    networks:
+      - dapr-net
+
+  redis:
+    image: redis:6
+    container_name: redis
+    ports:
+      - "6379:6379"
+    networks:
+      - dapr-net
+
+networks:
+  dapr-net:

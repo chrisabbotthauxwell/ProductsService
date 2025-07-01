@@ -17,12 +17,13 @@ public class ProductService
     public Product? GetById(string id) =>
         _products.FirstOrDefault(p => p.Id.Equals(id, StringComparison.OrdinalIgnoreCase));
 
-    public void UpdateStock(string id, int newStockCount)
+    public bool UpdateStock(string id, int newStockCount)
     {
         var product = GetById(id);
         if (product is not null)
         {
             product.StockCount = newStockCount;
         }
+        return product is not null;
     }
 }

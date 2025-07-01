@@ -4,7 +4,6 @@ EXPOSE 8080
 
 ENV ASPNETCORE_URLS=http://+:8080
 
-USER app
 FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG configuration=Release
 WORKDIR /src
@@ -21,4 +20,5 @@ RUN dotnet publish "ProductsService.csproj" -c $configuration -o /app/publish /p
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
+USER app
 ENTRYPOINT ["dotnet", "ProductsService.dll"]

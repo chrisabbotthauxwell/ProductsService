@@ -4,7 +4,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-builder.Services.AddControllers();
+builder.Services.AddControllers().AddDapr();
+builder.Services.AddDaprClient();
 
 // Register the ProductService as a singleton in memory
 builder.Services.AddSingleton<ProductService>();
@@ -25,6 +26,9 @@ if (app.Environment.IsDevelopment())
 // don't force HTTPS, let ACA ingress layer enforce TLS
 // can check X-Forwarded-Proto if need to detect secure request
 //app.UseHttpsRedirection();
+
+app.UseCloudEvents(); //for pub/sub payloads
+app.MapSubscribeHandler(); //for auto-discovery of pub/sub subscriptions
 
 app.UseAuthorization();
 

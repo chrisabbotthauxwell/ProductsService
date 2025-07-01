@@ -122,27 +122,71 @@ When the Products Service is processing a new order, if there is not enough stoc
 Services subscribing to the `order-backordered` topic can act on that event accordingly.
 
 # Tool chain
-- VSCode, Docker Desktop, .NET8.0, C#
+- VSCode, Docker Desktop, .NET8.0, C#, Dapr CLI
 - VSCode extensions:
     - .NET Extension Pack
     - C# base language support
     - C# Dev Kit
     - Azure Resources
     - Container Tools
-    - Docker
+    - Docker & Docker Compose
     - Mermaid Chart
 
-# Hosting environment
-All services deployed to Azure, using:
-- Azure Container Registry
-- Container Apps Environment
-- Azure Container Apps
-
 # Local development
+## Dapr CLI
+### Install
+Install the Dapr CLI from Powershell
+```
+iwr -useb https://raw.githubusercontent.com/dapr/cli/master/install/install.ps1 | iex
+```
+or from the command prompt
+```
+winget install Dapr.CLI
+```
+### Verify
+After Dapr CLI is installed, verify the installation with `dapr --version`. It should return:
+```
+CLI version: 1.15.1
+Runtime version: n/a
+```
+### Initialise
+Initalise Dapr to set up the Dapr CLI runtime
+```
+dapr init
+```
+This will create and start 4 Docker containers:
+- dapr_redis
+- dapr_zipkin
+- dapr_scheduler
+- dapr_placement
+
+Stop the `dapr_redis` container
+
 ## Run and Debug
-1. Check out tip of `main`
-2. VSCode -> Run and Debug -> "Docker: Launch .NET Core" debug profile
-3. Containerised debug session started -> Browser opens -> Swagger UI available on `/swagger/`
+### Vanilla .NET ProductsService
+1. VSCode -> Run and Debug -> "C#: ProductsService debug" debug profile
+2. Swagger UI opens on http://localhost:8080/swagger/index.html
+
+No dapr components running & no pubsub
+
+### Containerised ProductsService
+1. VSCode -> Run and Debug -> "Docker: Launch .NET Core" debug profile
+2. Browser opens on http://localhost:32769/
+3. Swagger UI available on http://localhost:32769/swagger/index.html
+
+No dapr components running & no pubsub
+
+### Vanilla .NET ProductsService + containerised dapr sidecaar & redis
+1. VSCode -> Powershell terminal -> `docker compose up --build`
+2. ProductsService, dapr-products and redis containers start on the `dapr-net` Docker network in Docker Desktop
+3. STOP the ProductsService container
+4. VSCode -> Run and Debug -> "C#: ProductsService debug" debug profile
+5. End-to-end pubsub works
+
+Note:
+Running all three containers on the `dapr-net` network results in a connectivity issue when publishing an event to dapr from the ProductsService API.
+
+Stopping the containerised ProductsService and starting the vanilla .NET version allows communication. More investigation is required to understand why connectivity fails for ProductsService on `dapr-net`
 
 ## Code changes
 Trunk based development -> Commit changes to `main` and push to origin
@@ -151,6 +195,12 @@ Trunk based development -> Commit changes to `main` and push to origin
 1. Explorer -> right-click Dockerfile -> Build Image... -> new image created
 2. Containers -> Registried > Connect Reigstry
 3. Containers -> Images -> productservice/lastest -> Push...
+
+# Azure Hosting environment
+All services deployed to Azure, using:
+- Azure Container Registry
+- Container Apps Environment
+- Azure Container Apps
 
 # Cloud deployment
 
@@ -186,13 +236,14 @@ sequenceDiagram
     opt Publish product-ordered
     Orders service->>order-placed topic: publish order-placed event
     order-placed topic->>Products service: read order-placed topic
-    Products service->>Products service: decrease StockCount for product
     Products service->>Products service: check stock for product
       alt in stock
+        Products service->>Products service: decrease StockCount for product
         Products service->>order-fulfilled topic: publish order-fulfilled event
         order-fulfilled topic->>Orders service: read order-fulfilled event
         Orders service->>Orders service: update order status: "Fulfilled"
       else out of stock
+        Products service->>Products service: decrease StockCount for product
         Products service->>order-backordered topic: publish order-backordered event
         order-backordered topic->>Orders service: read order-backordered event
         Orders service->>Orders service: update order status: "Pending"      
@@ -206,10 +257,10 @@ sequenceDiagram
       stock-available topic->>Orders service:read stock-available topic
       Orders service->>Orders service: find all Pending orders,\norder by oldest-first
       loop pending orders oldest-first
-        Orders service->Orders service: fulfill order if stock allows
+        Orders service->>Orders service: fulfill order if stock allows
       end
     end
   end
 ```
 
-[Viewable externally on sequencediagram.org](https://sequencediagram.org/index.html#initialData=C4S2BsFMAIAUCcD2ATArgY2NAhgO2dAPLzKTzQC2e2A5pBZLsAFDPaaLkDCqAzsIgbw2HcgHVs8SAAtEfGAFlqdYcwAOk0OhAamREmV7ReZAG4h0kdZos68WTqXgBaNeHaQCAtRevwtdnoIKBjARibw5pZ+AboOBi4AZqjgiSDgUF6IPugxtnHQjmTOAEbsANZFUlk5edoF-Ijo5c7Yptjp2CVQ0N6+zDRIqGpw7paFCcw8jULOAHzETuFmFpAAXOhS2MAwVcyLhsYrlvMH8MuRq2sTTsbA23zXAESwY55PA0MjsKjdILzSaBqJBoTDOKqefYJC5RSDzKquN41CzXNS-cD-QEItweAiQUyMFjYpG9bIWebBUFhI6XSzXLYEYm40m1SmhGGrCkg9k02HXUibSDYEzQADKAmaXDkekSnCB3MwzDZmA5JzmyupET50HQ0kgzTuTXK0Fl5GBIUV2HAWBAuENzSVCs1xzhcwRyVS6UyLJRQPRmJuxQ9aQynmg+MJzHdKRD3r66FO0N5V2gDMDSRjXrDEaYUKWybVZ1V62gw2Q212CTuD14zwAYpnQ8gPpBwCK5A5Evbyo6Lc7aa6EWVmhDkehUf6AenShVR+GCbmh7OEmH44n81qU2mlyOV3iFywiwXXUfN3TS2pyzt09XgI9oC9GMhbTQW-hmE+P+-PnJvk7uxeV5WBIUiyPI0BKLgtDFOqTrFtcZYVgBpryn2P7DHAk6Ao0zStO0nTdDAADa4pGlKqB6MA8B4LwYAgIguBGIkSAUNAgAmRAADKS0BzBxAC6rAasW8w4S0bQdO4hE+uOaJ-FOol4RJXQ9DmLAKeJBE9GuCxJme6xpup+GSVpZK5KeLrrocenXGk+A4BkcBPi+6a8AANAAOrgVTQCUACehTgKQ-DOGk5wsOAiDZECTm4DQLkBUFwAhSAYV5lZFk6RuLo2Y24A3iAXaifZEUAO68Kwn6VfgQA)
+[Viewable externally on sequencediagram.org](https://sequencediagram.org/index.html#initialData=C4S2BsFMAIAUCcD2ATArgY2NAhgO2dAPLzKTzQC2e2A5pBZLsAFDPaaLkDCqAzsIgbw2HcgHVs8SAAtEfGAFlqdYcwAOk0OhAamREmV7ReZAG4h0kdZos68WTqXgBaNeHaQCAtRevwtdnoIKBjARibw5pZ+AboOBi4AZqjgiSDgUF6IPugxtnHQjmTOAEbsANZFUlk5edoF-Ijo5c7Yptjp2CVQ0N6+zDRIqGpw7paFCcw8jULOAHzETuFmFpAAXOhS2MAwVcyLhsYrlvMH8MuRq2sTTsbA23zXAESwY55PA0MjsKjdILzSaBqJBoTDOKqefYJC5RSDzKquN41CzXNS-cD-QEItweAiQUyMFjYpG9bIWebBUFhI6XSzXLYEYm40m1SmhGGrCkg9k02HXdDSSDNO5NcrQRKcIHczBscBYEC4EXNZhszAck5zVXUiJ86CkTaQbAmaAAZQEzS4cj0EvIwJCMq16rhcwRyVS6UyLJRQPRmJuxTdaQynmg+MJzFdKSDnr66FO0N5V2gDP9SSjHpDYaYUKWiY1Zyd12GyG2uwSdwevGeADF08HkB9IOBjXIHIkleUVdLtcdnY68+s9UKtsazaLLahrZK7VSu-ae7TnQiys0Icj0KjfQDU6UKmvQwTs8u9wkQ7H47mdUmU8fV6e8YeWAWBxfDle6dBi6XUxXgI9oC8jDIAqNCNvgzBARB4GfHI3zdh2n5qCWOzMBIUiyPI0BKLgtDFJq3aFohyEwI0wo2lK84wcMcBboCpEtG0HTuN0MAANpjhaVpYMA8B4LwYAgIguBGIkSAUNAgAmRAADKS0BzFJAC6rD9u+zr0a07SdCxXobmifzbupjFaT0WYsIZmnMT054LAmqlrCm5lMV0Vlkrkz6qa+5wDtcaT4DgGRwEBIGprwAA0AA6uBVNAJQAJ6FOApD8M4aTnCw4CINkQJBbgNAhQlSXAClIBpTmb69p5hGBh6P4gO29H+RlADuvCsJB7X4EAA)
