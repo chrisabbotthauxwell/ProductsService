@@ -67,7 +67,7 @@ The Products Service integrates with event topics using a pub/sub flow with a Da
 ## Stock available
 If a product's stock level is above 0 then the product is `inStock` and any pending orders can be filled.
 
-A Warehose Manager can update the stock level for a given product. If a product's stock level is updated and it is now `inStock`, the Products Service will emit a `stock-available` event.
+A Warehosue Manager can update the stock level for a given product. If a product's stock level is updated and it is now `inStock`, the Products Service will emit a `stock-available` event.
 
 ```json
 {
@@ -89,7 +89,7 @@ When a Customer places an order through an external system, an event is publishe
 }
 ```
 
-Orders can be placed only for one product at a time. One or more items of that product can be orderd in a single transaction.
+Orders can be placed only for one type of product at a time. One or more items of that product can be ordered in a single transaction.
 
 The Products Service subscribes to the `order placed` topic and decreases the `StockCount` for a product when a new order is placed.
 
@@ -160,33 +160,37 @@ This will create and start 4 Docker containers:
 - dapr_scheduler
 - dapr_placement
 
-Stop the `dapr_redis` container
-
 ## Run and Debug
-### Vanilla .NET ProductsService
+### Local ProductsService
 1. VSCode -> Run and Debug -> "C#: ProductsService debug" debug profile
 2. Swagger UI opens on http://localhost:8080/swagger/index.html
 
 No dapr components running & no pubsub
+
+### Local ProductsServices + Dapr sidecare + containerised Redis
+1. Terminal > Powershell > browse to project folder where `ProductsService.csproj` is located
+```
+\ProductsService\ProductsService\ProductsService>
+```
+
+2. Build the project
+```
+dotnet build
+```
+
+3. Start the project and dapr side-car
+```
+dapr run --app-id productsserrvice --components-path ../components/ --app-port 8080 -- dotnet run --project .
+```
+
+4. Open project at `http://localhost:8080/swagger`
 
 ### Containerised ProductsService
 1. VSCode -> Run and Debug -> "Docker: Launch .NET Core" debug profile
 2. Browser opens on http://localhost:32769/
 3. Swagger UI available on http://localhost:32769/swagger/index.html
 
-No dapr components running & no pubsub
-
-### Vanilla .NET ProductsService + containerised dapr sidecaar & redis
-1. VSCode -> Powershell terminal -> `docker compose up --build`
-2. ProductsService, dapr-products and redis containers start on the `dapr-net` Docker network in Docker Desktop
-3. STOP the ProductsService container
-4. VSCode -> Run and Debug -> "C#: ProductsService debug" debug profile
-5. End-to-end pubsub works
-
-Note:
-Running all three containers on the `dapr-net` network results in a connectivity issue when publishing an event to dapr from the ProductsService API.
-
-Stopping the containerised ProductsService and starting the vanilla .NET version allows communication. More investigation is required to understand why connectivity fails for ProductsService on `dapr-net`
+> No dapr components running & no pubsub
 
 ## Code changes
 Trunk based development -> Commit changes to `main` and push to origin
