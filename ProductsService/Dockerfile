@@ -7,10 +7,12 @@ ENV ASPNETCORE_URLS=http://+:8080
 FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG configuration=Release
 WORKDIR /src
-COPY ["ProductsService/ProductsService.csproj", "ProductsService/"]
-RUN dotnet restore "ProductsService/ProductsService.csproj"
+#COPY ["/ProductsService.csproj", "ProductsService/"]
+COPY ProductsService.csproj ./
+#RUN dotnet restore "ProductsService/ProductsService.csproj"
+RUN dotnet restore "ProductsService.csproj"
 COPY . .
-WORKDIR "/src/ProductsService"
+WORKDIR "/src"
 RUN dotnet build "ProductsService.csproj" -c $configuration -o /app/build
 
 FROM build AS publish

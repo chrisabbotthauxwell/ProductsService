@@ -170,7 +170,7 @@ No dapr components running & no pubsub
 ### Local ProductsServices + Dapr sidecare + containerised Redis
 1. Terminal > Powershell > browse to project folder where `ProductsService.csproj` is located
 ```
-\ProductsService\ProductsService\ProductsService>
+\ProductsOrdersManagement\ProductsService>
 ```
 
 2. Build the project
@@ -184,19 +184,49 @@ dapr run --app-id productsserrvice --components-path ../components/ --app-port 8
 ```
 
 4. Open project at `http://localhost:8080/swagger`
+5. CTRL+C from the Terminal to stop the apps and exit Dapr.
 
 ### Containerised ProductsService
+#### Debug from VSCode
 1. VSCode -> Run and Debug -> "Docker: Launch .NET Core" debug profile
 2. Browser opens on http://localhost:32769/
 3. Swagger UI available on http://localhost:32769/swagger/index.html
 
 > No dapr components running & no pubsub
 
+#### Run from terminal
+1. Access the ProductsService folder in the Terminal
+2. Build a new container image
+```
+docker build .
+```
+3. Run the new container image
+```
+docker run -p 8080:8080 -e ASPNETCORE_ENVIRONMENT=Development productsservice:latest
+```
+ - -p 8080:8080 maps port 8080 in the container to port 8080 on the development host.
+ - -e ASPNETCORE_ENVIRONMENT=Development sets the environment to Development (optional, but useful for local testing).
+ - productsservice:latest is the image name and tag (replace with your actual image name if different).
+ - Access the service at http://localhost:8080/swagger/index.html.
+
 ## Code changes
 Trunk based development -> Commit changes to `main` and push to origin
 
-## Build container image and push to Container Registry
-1. Explorer -> right-click Dockerfile -> Build Image... -> new image created
+## Build container image
+Build and test container locally
+```
+cd "C:\Source code\CNA Level 2\Introspect 1B\ProductsService\ProductsService"
+
+docker build -f ProductsService/Dockerfile -t productsservice:latest .
+
+docker run -p 8080:8080 -e ASPNETCORE_ENVIRONMENT=Development productsservice:latest
+```
+
+Swagger UI accessible on : `http://localhost:8080/swagger/index.html`
+
+Or build from VSCode: Explorer -> right-click Dockerfile -> Build Image... -> new image created
+
+## Push image to registry
 2. Containers -> Registried > Connect Reigstry
 3. Containers -> Images -> productservice/lastest -> Push...
 
