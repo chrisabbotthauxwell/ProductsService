@@ -19,14 +19,6 @@ public class ProductsController : ControllerBase
         _productService = productService;
     }
 
-    [HttpGet("/healthz")]
-    public IActionResult Healthz()
-        => Ok("Healthy");
-
-    //[HttpGet("/")]
-    //public IActionResult Root()
-    //    => Ok("Healthy");
-
     [HttpGet]
     public ActionResult<IEnumerable<Product>> GetAll()
         => Ok(_productService.GetAll());

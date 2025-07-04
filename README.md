@@ -6,6 +6,21 @@ The microservice uses an in-memory product catalogue, no product data persistenc
 
 The microservices are integrated by a pub/sub flow with Dapr.
 
+# Tool chain
+- VSCode, Docker Desktop, .NET8.0, C#, Dapr CLI
+- VSCode extensions:
+    - .NET Extension Pack
+    - C# base language support
+    - C# Dev Kit
+    - Azure Resources
+    - Container Tools
+    - Docker & Docker Compose
+    - Mermaid Chart
+
+# Prerequisites
+- [Install](https://docs.dapr.io/getting-started/install-dapr-cli/) and [init](https://docs.dapr.io/getting-started/install-dapr-selfhost/) Dapr
+- Install [Docker Desktop](https://www.docker.com/products/docker-desktop/) (includes [Docker Compose](https://docs.docker.com/compose/install/))
+
 # Service endpoints
 ## Get product by id
 `GET /Products/{id}`
@@ -121,113 +136,48 @@ When the Products Service is processing a new order, if there is not enough stoc
 
 Services subscribing to the `order-backordered` topic can act on that event accordingly.
 
-# Tool chain
-- VSCode, Docker Desktop, .NET8.0, C#, Dapr CLI
-- VSCode extensions:
-    - .NET Extension Pack
-    - C# base language support
-    - C# Dev Kit
-    - Azure Resources
-    - Container Tools
-    - Docker & Docker Compose
-    - Mermaid Chart
-
-# Local development
-## Dapr CLI
-### Install
-Install the Dapr CLI from Powershell
+# Running locally
+## Local ProductsService + Dapr sidecar + Dapr Redis
+1. Components > `pubsub.yaml` > `redisHost` value set to `localhost:6379`
+```yml
+  metadata:
+    - name: redisHost
+      value: localhost:6379 #for local development
+      #value: redis:6379 #for running the stack with docker-compose
 ```
-iwr -useb https://raw.githubusercontent.com/dapr/cli/master/install/install.ps1 | iex
-```
-or from the command prompt
-```
-winget install Dapr.CLI
-```
-### Verify
-After Dapr CLI is installed, verify the installation with `dapr --version`. It should return:
-```
-CLI version: 1.15.1
-Runtime version: n/a
-```
-### Initialise
-Initalise Dapr to set up the Dapr CLI runtime
-```
-dapr init
-```
-This will create and start 4 Docker containers:
-- dapr_redis
-- dapr_zipkin
-- dapr_scheduler
-- dapr_placement
-
-## Run and Debug
-### Local ProductsService
-1. VSCode -> Run and Debug -> "C#: ProductsService debug" debug profile
-2. Swagger UI opens on http://localhost:8080/swagger/index.html
-
-No dapr components running & no pubsub
-
-### Local ProductsServices + Dapr sidecare + containerised Redis
-1. Terminal > Powershell > browse to project folder where `ProductsService.csproj` is located
-```
-\ProductsOrdersManagement\ProductsService>
-```
-
-2. Build the project
-```
-dotnet build
-```
-
-3. Start the project and dapr side-car
+2. `dapr_redis` container RUNNING in Docker Desktop
+3. From the ProductsService project root folder, run ProductsService and Dapr sidecar as local http services from Dapr CLI:
 ```
 dapr run --app-id productsserrvice --components-path ../components/ --app-port 8080 -- dotnet run --project .
 ```
-
 4. Open project at `http://localhost:8080/swagger`
-5. CTRL+C from the Terminal to stop the apps and exit Dapr.
+5. Attach debugger from CTRL+SHIFT+P > "Debug: Attach to .NET CORE process" if required
 
-### Containerised ProductsService
-#### Debug from VSCode
-1. VSCode -> Run and Debug -> "Docker: Launch .NET Core" debug profile
-2. Browser opens on http://localhost:32769/
-3. Swagger UI available on http://localhost:32769/swagger/index.html
+## Containerised ProductsService + Dapr sidecar + Compose Redis
+1. Components > `pubsub.yaml` > `redisHost` value set to `redis:6379`
+```yml
+  metadata:
+    - name: redisHost
+      #value: localhost:6379 #for local development
+      value: redis:6379 #for running the stack with docker-compose
+```
+2. `dapr_redis` container STOPPED in Docker Desktop
+3. From the Solution root folder, run ProductsService, the Dapr sidecar and redis as a Docker Compose stack:
+```
+docker compose up --build
+```
+4. Open project at `http://localhost:8080/swagger`
 
-> No dapr components running & no pubsub
-
-#### Run from terminal
-1. Access the ProductsService folder in the Terminal
-2. Build a new container image
-```
-docker build .
-```
-3. Run the new container image
-```
-docker run -p 8080:8080 -e ASPNETCORE_ENVIRONMENT=Development productsservice:latest
-```
- - -p 8080:8080 maps port 8080 in the container to port 8080 on the development host.
- - -e ASPNETCORE_ENVIRONMENT=Development sets the environment to Development (optional, but useful for local testing).
- - productsservice:latest is the image name and tag (replace with your actual image name if different).
- - Access the service at http://localhost:8080/swagger/index.html.
-
-## Code changes
+# Code changes
 Trunk based development -> Commit changes to `main` and push to origin
 
-## Build container image
-Build and test container locally
+# Build container image
 ```
-cd "C:\Source code\CNA Level 2\Introspect 1B\ProductsService\ProductsService"
-
-docker build -f ProductsService/Dockerfile -t productsservice:latest .
-
-docker run -p 8080:8080 -e ASPNETCORE_ENVIRONMENT=Development productsservice:latest
+docker build --no-cache -t productsservice:latest .
 ```
-
-Swagger UI accessible on : `http://localhost:8080/swagger/index.html`
-
-Or build from VSCode: Explorer -> right-click Dockerfile -> Build Image... -> new image created
 
 ## Push image to registry
-2. Containers -> Registried > Connect Reigstry
+2. Containers -> Registries > Connect Reigstry
 3. Containers -> Images -> productservice/lastest -> Push...
 
 # Azure Hosting environment
