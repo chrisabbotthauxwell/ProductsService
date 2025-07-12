@@ -7,7 +7,7 @@ The microservice uses an in-memory product catalogue, no product data persistenc
 The microservices are integrated by a pub/sub flow with Dapr.
 
 # Tool chain
-- VSCode, Docker Desktop, .NET8.0, C#, Dapr CLI
+- VSCode, Docker Desktop, .NET8.0, C#, Dapr CLI, Powershell 7
 - VSCode extensions:
     - .NET Extension Pack
     - C# base language support

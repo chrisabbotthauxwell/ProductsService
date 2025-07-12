@@ -1,0 +1,49 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/Azure/azure-dev/main/schemas/v1.0/azure.yaml.json
+
+name: productsordersmanagement
+metadata:
+  template: azd-init@1.17.2
+services:
+  productsservice:
+    project: ProductsService
+    host: containerapp
+    language: dotnet
+    docker:
+      context: .
+      dockerfile: ./ProductsService/Dockerfile
+      image: ${AZURE_CONTAINER_REGISTRY_NAME}.azurecr.io/productsservice:latest
+      build:
+        args:
+          BUILD_CONFIGURATION: Release
+        tags:
+          - latest
+    resources:
+      containerapp:
+        dapr:
+          enabled: true
+          appId: productsservice
+          appPort: 8080
+
+hooks:
+  postprovision:
+    windows:
+      shell: pwsh
+      run: |
+        # Get ACR details
+        $acrName = az acr list --resource-group $(az group list --query "[?contains(name, 'rg')].name" -o tsv) --query "[0].name" -o tsv
+        
+        # Login to ACR
+        az acr login --name $acrName
+        
+        # Build and tag image
+        $imageName = "productsservice:latest"
+        $acrImage = "$acrName.azurecr.io/$imageName"
+        
+        Write-Host "Building image: $imageName"
+        docker build -t $imageName -f ./ProductsService/Dockerfile .
+        
+        Write-Host "Tagging image for ACR: $acrImage"
+        docker tag $imageName $acrImage
+        
+        Write-Host "Pushing image to ACR: $acrImage"
+        docker push $acrImage
