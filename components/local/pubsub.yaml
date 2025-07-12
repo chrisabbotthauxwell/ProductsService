@@ -1,0 +1,12 @@
+# Local pubsub config
+apiVersion: dapr.io/v1alpha1
+kind: Component
+metadata:
+  name: pubsub
+spec:
+  type: pubsub.redis
+  version: v1
+  metadata:
+    - name: redisHost
+      #value: localhost:6379 #for local development
+      value: redis:6379 #for running the stack with docker-compose

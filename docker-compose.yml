@@ -27,10 +27,10 @@ services:
       "-app-port", "8080",
       "-dapr-http-port", "3500",
       "-dapr-grpc-port", "50001",
-      "-components-path", "/components"
+      "-components-path", "/components/local"
     ]
     volumes:
-      - ./components:/components
+      - ./components/local:/components/local
     network_mode: "service:productsservice"
 
   ######################################################

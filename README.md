@@ -148,7 +148,7 @@ Services subscribing to the `order-backordered` topic can act on that event acco
 2. `dapr_redis` container RUNNING in Docker Desktop
 3. From the ProductsService project root folder, run ProductsService and Dapr sidecar as local http services from Dapr CLI:
 ```
-dapr run --app-id productsserrvice --components-path ../components/ --app-port 8080 -- dotnet run --project .
+dapr run --app-id productsserrvice --resources-path ../components/local/ --app-port 8080 -- dotnet run --project .
 ```
 4. Open project at `http://localhost:8080/swagger`
 5. Attach debugger from CTRL+SHIFT+P > "Debug: Attach to .NET CORE process" if required
