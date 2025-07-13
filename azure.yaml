@@ -10,6 +10,12 @@ services:
         language: dotnet
         docker:
             path: ./ProductsService/Dockerfile
+            image: ${AZURE_CONTAINER_REGISTRY_NAME}.azurecr.io/productsservice:latest
+            build:
+              args:
+                BUILD_CONFIGURATION: Release
+              tags:
+                - latest
         dapr:
             enabled: true
             components-path: ./components/azure
