@@ -12,7 +12,6 @@ services:
             path: ./ProductsService/Dockerfile
         dapr:
             enabled: true
-            components-path: ./components/azure
 resources:
     productsservice:
         type: host.containerapp

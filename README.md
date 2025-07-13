@@ -176,17 +176,28 @@ Trunk based development -> Commit changes to `main` and push to origin
 docker build --no-cache -t productsservice:latest .
 ```
 
-## Push image to registry
-2. Containers -> Registries > Connect Reigstry
-3. Containers -> Images -> productservice/lastest -> Push...
+# Deploy infrastrcture and app to Azure
+Build and deployment is handled using `Powershell` scripts in the `/devops/` folder which are run from the commandline in the solution root.
 
-# Azure Hosting environment
-All services deployed to Azure, using:
-- Azure Container Registry
-- Container Apps Environment
-- Azure Container Apps
+Three scripts are prepared:
+## 1. Deployment variables
+`.\devops\variables.ps1` defines deployment variables for the deployment.
 
-# Cloud deployment
+Increment the `$ATTEMPT_NO` value to reflect the deployment version.
+
+## 2. Deploy infrastrcture
+From the solution root folder in a Powershell terminal, run:
+```bash
+.\devops\infrastrcuture.ps1
+```
+This will create the required Azure services ready for app deployment.
+
+## Build app image and deploy to ACA
+From the solution root folder in a Powershell terminal, run:
+```
+.\devops\deploy-app.ps1
+```
+This will create or update a Azure Container App.
 
 # Future CI/CD
 - Use Github PR process for merges to origin

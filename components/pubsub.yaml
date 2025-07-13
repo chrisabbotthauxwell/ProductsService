@@ -3,9 +3,11 @@ kind: Component
 metadata:
   name: pubsub
 spec:
-  type: pubsub.redis
+  type: pubsub.azure.servicebus
   version: v1
   metadata:
-    - name: redisHost
-      #value: localhost:6379 #for local development
-      value: redis:6379 #for running the stack with docker-compose
+    - name: connectionString
+      secretRef: servicebus-connection
+  secrets:
+    - name: servicebus-connection
+      value: "Endpoint=sb://<your-service-bus-namespace>.servicebus.windows.net/;SharedAccessKeyName=<your-policy-name>;SharedAccessKey"
