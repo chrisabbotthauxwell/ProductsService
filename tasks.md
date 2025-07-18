@@ -25,10 +25,10 @@
 - [ ] Logging for ProductsService
 
 ## OrdersService
-- [ ] Basic scaffolding for OrdersService
-- [ ] Get Orders
-- [ ] Get Order by id
-- [ ] Create new order
+- [x] Basic scaffolding for OrdersService
+- [x] Get Orders
+- [x] Get Order by id
+- [x] Create new order
 - [ ] Logic for newly `Placed` order + publish `order-placed` event
 - [ ] Subscribe to and handle `stock-available` event to fill orders
 - [ ] Subscribe to and handle `order-fulfilled` event to update `Fulfilled` order
