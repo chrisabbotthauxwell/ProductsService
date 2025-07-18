@@ -1,12 +1,14 @@
-# Running list of tasks to comlete
+# ProductsOrdersManagement task list
 
 ## Foundation
 - [x] Architecture diagram (microservices, Dapr, Service Bus)
+- [x] Data model design for ProductsService
+- [x] Data model design for OrdersService
 - [x] Service orchestration plan (service components and communications)
 - [x] Scaffold .net API
 - [x] Init git repo
 - [x] Establish README
-- [ ] Remove default WeatherForecast elements
+- [x] Remove default WeatherForecast elements
 - [ ] Logging/observability plan
 
 ## ProductsService
