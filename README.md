@@ -138,7 +138,7 @@ Services subscribing to the `order-backordered` topic can act on that event acco
 
 # Running locally
 ## Local ProductsService + Dapr sidecar + Dapr Redis
-1. Components > `pubsub.yaml` > `redisHost` value set to `localhost:6379`
+1. `components/local/` > `pubsub.yaml` > `redisHost` value set to `localhost:6379`
 ```yml
   metadata:
     - name: redisHost
@@ -154,7 +154,7 @@ dapr run --app-id productsserrvice --resources-path ../components/local/ --app-p
 5. Attach debugger from CTRL+SHIFT+P > "Debug: Attach to .NET CORE process" if required
 
 ## Containerised ProductsService + Dapr sidecar + Compose Redis
-1. Components > `pubsub.yaml` > `redisHost` value set to `redis:6379`
+1. `components/local/` > `pubsub.yaml` > `redisHost` value set to `redis:6379`
 ```yml
   metadata:
     - name: redisHost
