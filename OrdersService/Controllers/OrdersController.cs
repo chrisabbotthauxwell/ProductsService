@@ -44,7 +44,7 @@ public class OrdersController : ControllerBase
             productId = order.ProductId,
             quantity = order.Quantity
         };
-        //await daprClient.PublishEventAsync("pubsub", "order-placed", orderPlacedEvent);
+        await daprClient.PublishEventAsync("pubsub", "order-placed", orderPlacedEvent);
 
         return CreatedAtAction(nameof(GetById), new { id = order.Id }, order);
     }

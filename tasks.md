@@ -9,7 +9,8 @@
 - [x] Init git repo
 - [x] Establish README
 - [x] Remove default WeatherForecast elements
-- [ ] Logging/observability plan
+- [ ] Rationalise launchSettings.json for both projects
+- [x] Logging/observability plan
 
 ## ProductsService
 - [x] Basic scaffolding for ProductsService
@@ -19,24 +20,26 @@
 - [ ] Subscribe to and handle `order-placed` event
 - [ ] Logic for order fulfilled for order + publish `order-fulfilled` event
 - [ ] Logic for back ordered orders + publish `order-backordered` event
-- [x] Docker: Containerise basic ProductsService
 - [x] Integrate Dapr for pubsub
+- [x] Docker: Containerise basic ProductsService
 - [x] Docker Compose: Configure containerisation for ProductsService stack (service + Dapr sidecar + redis streams)
-- [ ] Logging for ProductsService
+- [ ] Logging locally to console
+- [ ] Logging to App Insights via Dapr Observability for ACA deployment
 
 ## OrdersService
 - [x] Basic scaffolding for OrdersService
 - [x] Get Orders
 - [x] Get Order by id
 - [x] Create new order
-- [ ] Logic for newly `Placed` order + publish `order-placed` event
+- [x] Logic for newly `Placed` order + publish `order-placed` event
 - [ ] Subscribe to and handle `stock-available` event to fill orders
 - [ ] Subscribe to and handle `order-fulfilled` event to update `Fulfilled` order
 - [ ] Subcsribe to and handle `order-backordered` event to update `Pending` order
-- [ ] Docker: Containerise basiv OrdersService
-- [ ] Integrate Dapr for pubsub
-- [ ] Docker Compose: Configure containerisation for OrdersService stack (service + Dapr sidecar + redis streams)
-- [ ] Logging for OrdersService
+- [x] Integrate Dapr for pubsub
+- [x] Docker: Containerise basic OrdersService
+- [x] Docker Compose: Configure containerisation for OrdersService stack (service + Dapr sidecar + redis streams)
+- [ ] Logging locally to console
+- [ ] Logging to App Insights via Dapr Observability for ACA deployment
 
 ## DevOps
 - [x] Explore `azd`

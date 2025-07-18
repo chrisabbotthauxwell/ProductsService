@@ -12,7 +12,7 @@ public class OrderService
     {
         new Order
         {
-            Id = "o001",
+            Id = Guid.NewGuid().ToString(),
             ProductId = "p002",
             Quantity = 1,
             Status = "placed",
@@ -21,7 +21,7 @@ public class OrderService
         },
         new Order
         {
-            Id = "o002",
+            Id = Guid.NewGuid().ToString(),
             ProductId = "p001",
             Quantity = 15,
             Status = "pending",
@@ -30,7 +30,7 @@ public class OrderService
         },
         new Order
         {
-            Id = "o003",
+            Id = Guid.NewGuid().ToString(),
             ProductId = "p001",
             Quantity = 6,
             Status = "fulfilled",

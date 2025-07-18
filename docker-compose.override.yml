@@ -2,3 +2,6 @@ services:
   productsservice:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
+  ordersservice:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development

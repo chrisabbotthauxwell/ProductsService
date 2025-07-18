@@ -33,6 +33,38 @@ services:
       - ./components/local:/components/local
     network_mode: "service:productsservice"
 
+  #################################
+  # Orders Service + Dapr sidecar
+  #################################
+  ordersservice:
+    build:
+      context: ./OrdersService
+      dockerfile: Dockerfile
+    container_name: ordersservice
+    ports:
+      - "8081:8081"  # ordersservice's exposed port
+    networks:
+      - dapr-net
+
+  dapr-orders:
+    image: "daprio/daprd:latest"
+    container_name: dapr-orders
+    depends_on:
+      - ordersservice
+      - redis
+    restart: on-failure
+    command: [
+      "/daprd",
+      "-app-id", "ordersservice",
+      "-app-port", "8081",
+      "-dapr-http-port", "3600",
+      "-dapr-grpc-port", "51001",
+      "-components-path", "/components/local"
+    ]
+    volumes:
+      - ./components/local:/components/local
+    network_mode: "service:ordersservice"
+
   ######################################################
   # Redis Service (for local pub/sub over Redis Streams)
   ######################################################

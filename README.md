@@ -279,12 +279,32 @@ Creates a new order detailing the ordered product and the quanitity ordered.
 2. `dapr_redis` container RUNNING in Docker Desktop
 3. From the ProductsService project root folder, run ProductsService and Dapr sidecar as local http services from Dapr CLI:
 ```
+dotnet build
+
 dapr run --app-id productsserrvice --resources-path ../components/local/ --app-port 8080 -- dotnet run --project .
 ```
 4. Open project at `http://localhost:8080/swagger`
-5. Attach debugger from CTRL+SHIFT+P > "Debug: Attach to .NET CORE process" if required
+5. Attach debugger from CTRL+SHIFT+P > "Debug: Attach to .NET CORE process" if required.
 
-## Containerised ProductsService + Dapr sidecar + Compose Redis
+## Local OrdersService + Dapr sidecar + Dapr redis
+1. `components/local/` > `pubsub.yaml` > `redisHost` value set to `localhost:6379`
+```yml
+  metadata:
+    - name: redisHost
+      value: localhost:6379 #for local development
+      #value: redis:6379 #for running the stack with docker-compose
+```
+2. `dapr_redis` container RUNNING in Docker Desktop
+3. From the OrdersService project root folder, run OrdersService and Dapr sidecar as local http services from Dapr CLI:
+```
+dotnet build
+
+dapr run --app-id ordersservice --resources-path ../components/local/ --app-port 8081 -- dotnet run --project .
+```
+4. Open project at `http://localhost:8081/swagger`
+5. Attach debugger from CTRL+SHIFT+P > "Debug: Attach to .NET CORE process" if required.
+
+## Containerised ProductsService + OrdersService + Dapr sidecars + Compose Redis
 1. `components/local/` > `pubsub.yaml` > `redisHost` value set to `redis:6379`
 ```yml
   metadata:
@@ -293,11 +313,12 @@ dapr run --app-id productsserrvice --resources-path ../components/local/ --app-p
       value: redis:6379 #for running the stack with docker-compose
 ```
 2. `dapr_redis` container STOPPED in Docker Desktop
-3. From the Solution root folder, run ProductsService, the Dapr sidecar and redis as a Docker Compose stack:
+3. From the Solution root folder, run ProductsService, OrdersService, the Dapr sidecars and redis as a Docker Compose stack:
 ```
 docker compose up --build
 ```
-4. Open project at `http://localhost:8080/swagger`
+4. Open ProductsService swagger UI at `http://localhost:8080/swagger`
+4. Open OrdersService swagger UI at `http://localhost:8081/swagger`
 
 # Code changes
 Trunk based development -> Commit changes to `main` and push to origin
