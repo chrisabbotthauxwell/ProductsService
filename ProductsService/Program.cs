@@ -1,6 +1,17 @@
 using ProductsService.Services;
+using Serilog;
 
+// Create the WebApplicationBuilder with explicit serilog.json config
 var builder = WebApplication.CreateBuilder(args);
+builder.Configuration.AddJsonFile("serilog.json", optional: false, reloadOnChange: true);
+
+// Add Serilog after adding the configuration file
+builder.Host.UseSerilog((context, services, configuration) =>
+    configuration
+        .ReadFrom.Configuration(context.Configuration)
+        .ReadFrom.Services(services)
+        .Enrich.FromLogContext()
+);
 
 // Add services to the container.
 
@@ -34,4 +45,6 @@ app.UseAuthorization();
 
 app.MapControllers();
 
+// serilog entry for application start
+Log.Information("ProductsService started at {Time}", DateTime.UtcNow);
 app.Run();

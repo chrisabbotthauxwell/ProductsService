@@ -10,7 +10,7 @@
 - [x] Establish README
 - [x] Remove default WeatherForecast elements
 - [ ] Rationalise launchSettings.json for both projects
-- [x] Logging/observability plan
+- [X] Logging/observability plan
 
 ## ProductsService
 - [x] Basic scaffolding for ProductsService
@@ -23,7 +23,7 @@
 - [x] Integrate Dapr for pubsub
 - [x] Docker: Containerise basic ProductsService
 - [x] Docker Compose: Configure containerisation for ProductsService stack (service + Dapr sidecar + redis streams)
-- [ ] Logging locally to console
+- [ ] Logging locally to console/file
 - [ ] Logging to App Insights via Dapr Observability for ACA deployment
 
 ## OrdersService
@@ -38,11 +38,11 @@
 - [x] Integrate Dapr for pubsub
 - [x] Docker: Containerise basic OrdersService
 - [x] Docker Compose: Configure containerisation for OrdersService stack (service + Dapr sidecar + redis streams)
-- [ ] Logging locally to console
+- [ ] Logging locally to console/file
 - [ ] Logging to App Insights via Dapr Observability for ACA deployment
 
 ## DevOps
-- [x] Explore `azd`
+- [x] Explore `azd` & bicep
 - [x] Explore `az cli`
 - [x] Create script to deploy infrastructure
 - [x] Create script to deploy containerised ProductsService + Dapr sidecar

@@ -20,5 +20,7 @@ RUN dotnet publish "ProductsService.csproj" -c $configuration -o /app/publish /p
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
+COPY serilog.json ./
+RUN mkdir -p /app/logs && chown -R app:app /app/logs
 USER app
 ENTRYPOINT ["dotnet", "ProductsService.dll"]

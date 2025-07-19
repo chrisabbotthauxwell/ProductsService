@@ -1,12 +1,19 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 using OrdersService.Models;
 
 namespace OrdersService.Services;
 
 public class OrderService
 {
+    private readonly ILogger<OrderService> _logger;
+    public OrderService(ILogger<OrderService> logger)
+    {
+        _logger = logger;
+    }
+
     // Example orders based on readme.md
     private static readonly List<Order> _orders = new()
     {
@@ -39,10 +46,17 @@ public class OrderService
         }
     };
 
-    public IEnumerable<Order> GetAll() => _orders;
+    public IEnumerable<Order> GetAll()
+    {
+        _logger.LogInformation("Retrieving all orders");
+        return _orders;
+    }
 
-    public Order? GetById(string orderId) =>
-        _orders.FirstOrDefault(o => o.Id.Equals(orderId, StringComparison.OrdinalIgnoreCase));
+    public Order? GetById(string orderId)
+    {
+        _logger.LogInformation("Retrieving order by id: {OrderId}", orderId);
+        return _orders.FirstOrDefault(o => o.Id.Equals(orderId, StringComparison.OrdinalIgnoreCase));
+    }
 
     public Order Create(string productId, int quantity)
     {
@@ -57,6 +71,7 @@ public class OrderService
             UpdatedAt = now
         };
         _orders.Add(order);
+        _logger.LogInformation("Created new order {OrderId} for product {ProductId} with quantity {Quantity}", order.Id, productId, quantity);
         return order;
     }
 
@@ -67,6 +82,11 @@ public class OrderService
         {
             order.Status = status;
             order.UpdatedAt = DateTime.UtcNow;
+            _logger.LogInformation("Updated status for order {OrderId} to {Status}", orderId, status);
+        }
+        else
+        {
+            _logger.LogWarning("Order not found for status update: {OrderId}", orderId);
         }
         return order is not null;
     }

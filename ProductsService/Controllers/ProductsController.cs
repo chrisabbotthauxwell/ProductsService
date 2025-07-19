@@ -2,6 +2,7 @@ using System.Threading.Tasks;
 using Dapr.Client;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using ProductsService.Dtos;
 using ProductsService.Models;
 using ProductsService.Services;
@@ -13,21 +14,32 @@ namespace ProductsService.Controllers;
 public class ProductsController : ControllerBase
 {
     private readonly ProductService _productService;
+    private readonly ILogger<ProductsController> _logger;
 
-    public ProductsController(ProductService productService)
+    public ProductsController(ProductService productService, ILogger<ProductsController> logger)
     {
         _productService = productService;
+        _logger = logger;
     }
 
     [HttpGet]
     public ActionResult<IEnumerable<Product>> GetAll()
-        => Ok(_productService.GetAll());
+    {
+        _logger.LogInformation("Getting all products");
+        return Ok(_productService.GetAll());
+    }
 
     [HttpGet("{id}")]
     public ActionResult<Product> GetById(string id)
     {
+        _logger.LogInformation("Getting product by id: {ProductId}", id);
         var product = _productService.GetById(id);
-        return product is null ? NotFound() : Ok(product);
+        if (product is null)
+        {
+            _logger.LogWarning("Product not found: {ProductId}", id);
+            return NotFound();
+        }
+        return Ok(product);
     }
 
     [HttpPut("{id}/stock")]
@@ -36,13 +48,10 @@ public class ProductsController : ControllerBase
             [FromBody] ProductUpdateDto update,
             [FromServices] DaprClient daprClient)
     {
-        // update stock for product
+        _logger.LogInformation("Updating stock for product {ProductId} to {StockCount}", id, update.StockCount);
         if (_productService.UpdateStock(id, update.StockCount))
         {
-            // get the updated product to check if it is now in stock
             var product = _productService.GetById(id);
-
-            // If the product is in stock, publish a StockAvailableEvent
             if (product is not null && product.InStock)
             {
                 var stockAvailableEvent = new StockAvailableEventDto
@@ -52,15 +61,12 @@ public class ProductsController : ControllerBase
                     StockCount = product.StockCount,
                     RestockedDateTime = DateTime.UtcNow
                 };
-
                 await daprClient.PublishEventAsync("pubsub", "stock-available", stockAvailableEvent);
+                _logger.LogInformation("Published stock-available event for product {ProductId}", product.Id);
             }
-
             return NoContent();
         }
-        else
-        {
-            return NotFound();
-        }
+        _logger.LogWarning("Product not found for stock update: {ProductId}", id);
+        return NotFound();
     }
 }

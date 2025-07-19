@@ -267,8 +267,8 @@ Returns all Order objects as JSON
 ```
 Creates a new order detailing the ordered product and the quanitity ordered.
 
-# Running locally
-## Local ProductsService + Dapr sidecar + Dapr Redis
+## Running locally
+### Local ProductsService + Dapr sidecar + Dapr Redis
 1. `components/local/` > `pubsub.yaml` > `redisHost` value set to `localhost:6379`
 ```yml
   metadata:
@@ -286,7 +286,7 @@ dapr run --app-id productsserrvice --resources-path ../components/local/ --app-p
 4. Open project at `http://localhost:8080/swagger`
 5. Attach debugger from CTRL+SHIFT+P > "Debug: Attach to .NET CORE process" if required.
 
-## Local OrdersService + Dapr sidecar + Dapr redis
+### Local OrdersService + Dapr sidecar + Dapr redis
 1. `components/local/` > `pubsub.yaml` > `redisHost` value set to `localhost:6379`
 ```yml
   metadata:
@@ -304,7 +304,7 @@ dapr run --app-id ordersservice --resources-path ../components/local/ --app-port
 4. Open project at `http://localhost:8081/swagger`
 5. Attach debugger from CTRL+SHIFT+P > "Debug: Attach to .NET CORE process" if required.
 
-## Containerised ProductsService + OrdersService + Dapr sidecars + Compose Redis
+### Containerised ProductsService + OrdersService + Dapr sidecars + Compose Redis
 1. `components/local/` > `pubsub.yaml` > `redisHost` value set to `redis:6379`
 ```yml
   metadata:
@@ -320,44 +320,63 @@ docker compose up --build
 4. Open ProductsService swagger UI at `http://localhost:8080/swagger`
 4. Open OrdersService swagger UI at `http://localhost:8081/swagger`
 
-# Code changes
+## Logging
+Dual-mode logging strategy for local debugging and deployment to Azure Container Apps using [Serilog](https://serilog.net/).
+
+- Environment-based switching, driven by `ASPNETCORE_ENVIRONMENT` value.
+- All logs are structured as JSON for easy querying and analysis.
+- Log level is configurable by environment variable for both local and cloud.
+- Serilog configuration is held in `serilog.json`.
+
+### Logging for local development
+`ASPNETCORE_ENVIRONMENT=Development`
+
+- Console and file sinks (with rolling files for retention).
+- Debug level logging.
+- Fast, visible, and file-persistent logs with no cloud dependency.
+
+### Logging for Azure deployments
+- Console sink only (file logging not required).
+- Information level logging.
+- Centralized, queryable logs with correlation across services using Dapr Observability, Application Insights, and Azure Monitor for both logs and distributed tracing.
+- Dapr sidecars in ACA automatically export logs, metrics, and traces to Azure Monitor/App Insights.
+
+## Code changes
 Trunk based development -> Commit changes to `main` and push to origin
 
-# Build container image
+## Build container image
 ```
 docker build --no-cache -t productsservice:latest .
 ```
 
-# Deploy infrastrcture and app to Azure
+## Deploy infrastrcture and app to Azure
 Build and deployment is handled using `Powershell` scripts in the `/devops/` folder which are run from the commandline in the solution root.
 
 Three scripts are prepared:
-## 1. Deployment variables
+### 1. Deployment variables
 `.\devops\variables.ps1` defines deployment variables for the deployment.
 
 Increment the `$ATTEMPT_NO` value to reflect the deployment version.
 
-## 2. Deploy infrastrcture
+### 2. Deploy infrastrcture
 From the solution root folder in a Powershell terminal, run:
 ```bash
 .\devops\infrastrcuture.ps1
 ```
 This will create the required Azure services ready for app deployment.
 
-## Build app image and deploy to ACA
+### Build app image and deploy to ACA
 From the solution root folder in a Powershell terminal, run:
 ```
 .\devops\deploy-app.ps1
 ```
 This will create or update a Azure Container App.
 
-# Future CI/CD
+## Future CI/CD
 - Use Github PR process for merges to origin
     - Automate PRs using GenAI code review agent
     - Automate code quality checks
     - Human in the loop to approve PR before merge
 - On merge to `main`
     - Automate creation new Docker image and push to ACR
-    - Automate creation of new revision microservice and deploy new image
-
-# 
+    - Automate creation of new revision microservice and deploy new image 

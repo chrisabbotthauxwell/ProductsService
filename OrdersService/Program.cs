@@ -1,6 +1,17 @@
 using OrdersService.Services;
+using Serilog;
+
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Configuration.AddJsonFile("serilog.json", optional: false, reloadOnChange: true);
+
+// Add Serilog after adding the configuration file
+builder.Host.UseSerilog((context, services, configuration) =>
+    configuration
+        .ReadFrom.Configuration(context.Configuration)
+        .ReadFrom.Services(services)
+        .Enrich.FromLogContext()
+);
 
 // Add services to the container.
 
@@ -34,4 +45,5 @@ app.UseAuthorization();
 
 app.MapControllers();
 
+Log.Information("OrdersService started at {Time}", DateTime.UtcNow);
 app.Run();
