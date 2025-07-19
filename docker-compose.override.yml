@@ -2,6 +2,8 @@ services:
   productsservice:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
+      - DAPR_GRPC_PORT=50001
   ordersservice:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
+      - DAPR_GRPC_PORT=51001
