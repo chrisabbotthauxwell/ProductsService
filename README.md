@@ -267,8 +267,8 @@ Returns all Order objects as JSON
 ```
 Creates a new order detailing the ordered product and the quanitity ordered.
 
-# Running locally
-## Local ProductsService + Dapr sidecar + Dapr Redis
+## Running locally
+### Local ProductsService + Dapr sidecar + Dapr Redis
 1. `components/local/` > `pubsub.yaml` > `redisHost` value set to `localhost:6379`
 ```yml
   metadata:
@@ -286,7 +286,7 @@ dapr run --app-id productsserrvice --resources-path ../components/local/ --app-p
 4. Open project at `http://localhost:8080/swagger`
 5. Attach debugger from CTRL+SHIFT+P > "Debug: Attach to .NET CORE process" if required.
 
-## Local OrdersService + Dapr sidecar + Dapr redis
+### Local OrdersService + Dapr sidecar + Dapr redis
 1. `components/local/` > `pubsub.yaml` > `redisHost` value set to `localhost:6379`
 ```yml
   metadata:
@@ -304,7 +304,7 @@ dapr run --app-id ordersservice --resources-path ../components/local/ --app-port
 4. Open project at `http://localhost:8081/swagger`
 5. Attach debugger from CTRL+SHIFT+P > "Debug: Attach to .NET CORE process" if required.
 
-## Containerised ProductsService + OrdersService + Dapr sidecars + Compose Redis
+### Containerised ProductsService + OrdersService + Dapr sidecars + Compose Redis
 1. `components/local/` > `pubsub.yaml` > `redisHost` value set to `redis:6379`
 ```yml
   metadata:
@@ -319,6 +319,27 @@ docker compose up --build
 ```
 4. Open ProductsService swagger UI at `http://localhost:8080/swagger`
 4. Open OrdersService swagger UI at `http://localhost:8081/swagger`
+
+## Logging
+Dual-mode logging strategy for local debugging and deployment to Azure Container Apps, using `Microsoft.Extensions.Logging`.
+
+- Environment-based switching, driven by `ASPNETCORE_ENVIRONMENT` value.
+- All logs are structured as JSON for easy querying and analysis, using the ConsoleFormatter feature.
+- Log level is configurable by environment variable for both local and cloud.
+- Simple logging implemented. More complex logging could be implemented using [Serilog](https://serilog.net/)
+
+### Logging for local development
+
+- Console sink only.
+- Debug level logging for visibility of all levels of log output.
+- Fast, visible, and file-persistent logs with no cloud dependency.
+
+### Logging for Azure deployments
+- Console sink only.
+- Information level logging.
+- Centralized, queryable logs with correlation across services using Dapr Observability, Application Insights, and Azure Monitor for both logs and distributed tracing.
+- Dapr sidecars in ACA automatically export logs, metrics, and traces to Azure Monitor/App Insights.
+- For distributed tracing, logs should correlation IDs or trace context. This is supported by default when using Dapr and App Insights. No extra code is needed, console output must be JSON.
 
 # Code changes
 Trunk based development -> Commit changes to `main` and push to origin

@@ -23,7 +23,7 @@
 - [x] Integrate Dapr for pubsub
 - [x] Docker: Containerise basic ProductsService
 - [x] Docker Compose: Configure containerisation for ProductsService stack (service + Dapr sidecar + redis streams)
-- [ ] Logging locally to console
+- [x] Logging locally to console
 - [ ] Logging to App Insights via Dapr Observability for ACA deployment
 
 ## OrdersService
@@ -38,7 +38,7 @@
 - [x] Integrate Dapr for pubsub
 - [x] Docker: Containerise basic OrdersService
 - [x] Docker Compose: Configure containerisation for OrdersService stack (service + Dapr sidecar + redis streams)
-- [ ] Logging locally to console
+- [x] Logging locally to console
 - [ ] Logging to App Insights via Dapr Observability for ACA deployment
 
 ## DevOps

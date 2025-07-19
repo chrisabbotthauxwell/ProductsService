@@ -14,6 +14,14 @@ builder.Services.AddSingleton<OrderService>();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole();
+
+//builder.Services.AddHttpLogging(logging =>
+//{
+//   logging.LoggingFields = Microsoft.AspNetCore.HttpLogging.HttpLoggingFields.All;
+//});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -29,6 +37,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseCloudEvents(); //for pub/sub payloads
 app.MapSubscribeHandler(); //for auto-discovery of pub/sub subscriptions
+//app.UseHttpLogging(); //for logging HTTP requests
 
 app.UseAuthorization();
 

@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using OrdersService.Models;
 using OrdersService.Services;
 using OrdersService.Dtos;
+using Microsoft.Extensions.Logging;
 
 namespace OrdersService.Controllers;
 
@@ -13,21 +14,32 @@ namespace OrdersService.Controllers;
 public class OrdersController : ControllerBase
 {
     private readonly OrderService _orderService;
+    private readonly ILogger<OrdersController> _logger;
 
-    public OrdersController(OrderService orderService)
+    public OrdersController(OrderService orderService, ILogger<OrdersController> logger)
     {
         _orderService = orderService;
+        _logger = logger;
     }
 
     [HttpGet]
     public ActionResult<IEnumerable<Order>> GetAll()
-        => Ok(_orderService.GetAll());
+    {
+        _logger.LogInformation("Getting all orders");
+        return Ok(_orderService.GetAll());
+    }
 
     [HttpGet("{id}")]
     public ActionResult<Order> GetById(string id)
     {
+        _logger.LogInformation("Getting order by id: {OrderId}", id);
         var order = _orderService.GetById(id);
-        return order is null ? NotFound() : Ok(order);
+        if (order is null)
+        {
+            _logger.LogWarning("Order not found: {OrderId}", id);
+            return NotFound();
+        }
+        return Ok(order);
     }
 
     [HttpPost]
@@ -35,24 +47,37 @@ public class OrdersController : ControllerBase
         [FromBody] OrderCreateDto dto,
         [FromServices] DaprClient daprClient)
     {
-        var order = _orderService.Create(dto.ProductId, dto.Quantity);
-
-        // Publish order-placed event
-        var orderPlacedEvent = new
+        _logger.LogInformation("Creating order for product {ProductId} with quantity {Quantity}", dto.ProductId, dto.Quantity);
+        try
         {
-            orderId = order.Id,
-            productId = order.ProductId,
-            quantity = order.Quantity
-        };
-        await daprClient.PublishEventAsync("pubsub", "order-placed", orderPlacedEvent);
-
-        return CreatedAtAction(nameof(GetById), new { id = order.Id }, order);
+            var order = _orderService.Create(dto.ProductId, dto.Quantity);
+            var orderPlacedEvent = new
+            {
+                orderId = order.Id,
+                productId = order.ProductId,
+                quantity = order.Quantity
+            };
+            await daprClient.PublishEventAsync("pubsub", "order-placed", orderPlacedEvent);
+            _logger.LogInformation("Published order-placed event for order {OrderId}", order.Id);
+            return CreatedAtAction(nameof(GetById), new { id = order.Id }, order);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error creating order for product {ProductId}", dto.ProductId);
+            throw;
+        }
     }
 
     [HttpPut("{id}/status")]
     public IActionResult UpdateStatus(string id, [FromBody] string status)
     {
+        _logger.LogInformation("Updating status for order {OrderId} to {Status}", id, status);
         var updated = _orderService.UpdateStatus(id, status);
-        return updated ? NoContent() : NotFound();
+        if (!updated)
+        {
+            _logger.LogWarning("Order not found for status update: {OrderId}", id);
+            return NotFound();
+        }
+        return NoContent();
     }
 }
