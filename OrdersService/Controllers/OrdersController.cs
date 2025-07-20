@@ -52,11 +52,11 @@ public class OrdersController : ControllerBase
         try
         {
             var order = _orderService.Create(dto.ProductId, dto.Quantity);
-            var orderPlacedEvent = new
+            var orderPlacedEvent = new OrderPlacedEventDto
             {
-                orderId = order.Id,
-                productId = order.ProductId,
-                quantity = order.Quantity
+                OrderId = order.Id,
+                ProductId = order.ProductId,
+                Quantity = order.Quantity
             };
             await daprClient.PublishEventAsync("pubsub", "order-placed", orderPlacedEvent);
             _logger.LogInformation("Published order-placed event for order {OrderId}", order.Id);
@@ -108,6 +108,64 @@ public class OrdersController : ControllerBase
                 // Stop after fulfilling one order as per requirements
                 break;
             }
+            else
+            {
+                // Not enough stock to fulfil this order, skip it
+                _logger.LogInformation("Not enough stock to fulfil order {OrderId}, skipping", order.Id);
+
+                // Update order updatedAt timestamp
+                _orderService.UpdateUpdatedAt(order.Id, DateTime.UtcNow);
+            }
+        }
+
+        return Ok();
+    }
+
+    // Dapr subscription for order-fulfilled topic
+    [HttpPost("/dapr/subscribe/order-fulfilled")]  
+    [Topic("pubsub", "order-fulfilled")]
+    public async Task<IActionResult> OnOrderFulfilled(
+        [FromBody] OrderFulfilledEventDto orderFulfilled,
+        [FromServices] DaprClient daprClient)
+    {
+        _logger.LogInformation("Received order-fulfilled event for order {OrderId}, product {ProductId}, quantity {Quantity}", orderFulfilled.OrderId, orderFulfilled.ProductId, orderFulfilled.Quantity);
+
+        // Logic to handle fulfilled orders can be added here if needed
+        var order = _orderService.GetById(orderFulfilled.OrderId);
+        if (order is null)
+        {
+            _logger.LogWarning("Order not found for fulfillment: {OrderId}", orderFulfilled.OrderId);
+            return NotFound();
+        }
+        else
+        {
+            _orderService.UpdateStatus(order.Id, "fulfilled");
+            _logger.LogInformation("Order {OrderId} is fulfilled", orderFulfilled.OrderId);
+        }
+
+        return Ok();
+    }
+
+    // Dapr subscription for order-backordered topic
+    [HttpPost("/dapr/subscribe/order-backordered")]
+    [Topic("pubsub", "order-backordered")]
+    public async Task<IActionResult> OnOrderBackordered(
+        [FromBody] OrderBackorderedEventDto orderBackordered,
+        [FromServices] DaprClient daprClient)
+    {
+        _logger.LogInformation("Received order-backordered event for order {OrderId}, product {ProductId}, quantity {Quantity}", orderBackordered.OrderId, orderBackordered.ProductId, orderBackordered.Quantity);
+
+        // Logic to handle backordered orders can be added here if needed
+        var order = _orderService.GetById(orderBackordered.OrderId);
+        if (order is null)
+        {
+            _logger.LogWarning("Order not found for backorder: {OrderId}", orderBackordered.OrderId);
+            return NotFound();
+        }
+        else
+        {
+            _orderService.UpdateStatus(order.Id, "pending");
+            _logger.LogInformation("Order {OrderId} is backordered", orderBackordered.OrderId);
         }
 
         return Ok();

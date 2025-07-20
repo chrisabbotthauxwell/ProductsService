@@ -18,9 +18,9 @@
 - [x] Get Product by id
 - [x] Logic for stock update for product + publish `stock-available` event
 - [x] Subscribe to and handle `stock-updated` event after an order is fulfilled
-- [ ] Subscribe to and handle `order-placed` event
-- [ ] Logic for order fulfilled for order + publish `order-fulfilled` event
-- [ ] Logic for back ordered orders + publish `order-backordered` event
+- [x] Subscribe to and handle `order-placed` event
+- [x] Logic for order fulfilled for order + publish `order-fulfilled` event
+- [x] Logic for back ordered orders + publish `order-backordered` event
 - [x] Update Azure pubsub.yaml component definition to allow both productsservice & ordersservice to access the same topics
 - [x] Integrate Dapr for pubsub
 - [x] Docker: Containerise basic ProductsService
@@ -36,8 +36,8 @@
 - [x] Logic for newly `Placed` order + publish `order-placed` event
 - [x] Subscribe to and handle `stock-available` event to fill orders
 - [x] Publish `stock-updated` event when order is fulfilled after `stock-available` event
-- [ ] Subscribe to and handle `order-fulfilled` event to update `Fulfilled` order
-- [ ] Subcsribe to and handle `order-backordered` event to update `Pending` order
+- [x] Subscribe to and handle `order-fulfilled` event to update `Fulfilled` order
+- [x] Subcsribe to and handle `order-backordered` event to update `Pending` order
 - [x] Integrate Dapr for pubsub
 - [x] Docker: Containerise basic OrdersService
 - [x] Docker Compose: Configure containerisation for OrdersService stack (service + Dapr sidecar + redis streams)

@@ -94,4 +94,19 @@ public class OrderService
         }
         return order is not null;
     }
+
+    public bool UpdateUpdatedAt(string orderId, DateTime updatedAt)
+    {
+        var order = GetById(orderId);
+        if (order is not null)
+        {
+            _logger.LogInformation("Updating updatedAt for order {OrderId} to {UpdatedAt}", orderId, updatedAt);
+            order.UpdatedAt = updatedAt;
+        }
+        else
+        {
+            _logger.LogWarning("Order not found for updatedAt update: {OrderId}", orderId);
+        }
+        return order is not null;
+    }
 }
