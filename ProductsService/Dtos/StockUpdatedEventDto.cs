@@ -1,4 +1,4 @@
-namespace OrdersService.Dtos;
+namespace ProductsService.Dtos;
 
 public class StockUpdatedEventDto
 {

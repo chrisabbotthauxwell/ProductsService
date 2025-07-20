@@ -1,4 +1,5 @@
 using System.Threading.Tasks;
+using Dapr;
 using Dapr.Client;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -84,5 +85,29 @@ public class ProductsController : ControllerBase
             _logger.LogError(ex, "Error updating stock for product {ProductId}", id);
             throw;
         }
+    }
+
+        // Dapr subscription for stock-updated topic
+    [HttpPost("/dapr/subscribe/stock-updated")]
+    [Topic("pubsub", "stock-updated")]
+    public IActionResult OnStockUpdated([FromBody] StockUpdatedEventDto stockUpdated)
+    {
+        _logger.LogInformation("Received stock-updated event for product {ProductId}, quantity {Quantity}, order {OrderId}", stockUpdated.ProductId, stockUpdated.Quantity, stockUpdated.OrderId);
+
+        var product = _productService.GetById(stockUpdated.ProductId);
+        if (product is null)
+        {
+            _logger.LogWarning("Product not found for stock update: {ProductId}", stockUpdated.ProductId);
+            return NotFound();
+        }
+
+        // Decrease stock count by the fulfilled quantity
+        var newStockCount = product.StockCount - stockUpdated.Quantity;
+        if (newStockCount < 0) newStockCount = 0;
+        _productService.UpdateStock(product.Id, newStockCount);
+
+        _logger.LogInformation("Product {ProductId} stock decreased by {Quantity}, new stock: {StockCount}", product.Id, stockUpdated.Quantity, newStockCount);
+
+        return Ok();
     }
 }
