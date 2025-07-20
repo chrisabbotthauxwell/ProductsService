@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Dapr;
 using Dapr.Client;
 using Microsoft.AspNetCore.Mvc;
 using OrdersService.Models;
@@ -66,6 +67,50 @@ public class OrdersController : ControllerBase
             _logger.LogError(ex, "Error creating order for product {ProductId}", dto.ProductId);
             throw;
         }
+    }
+
+    // Dapr subscription for stock-available topic
+    [HttpPost("/dapr/subscribe/stock-available")]
+    [Topic("pubsub", "stock-available")]
+    public async Task<IActionResult> OnStockAvailable(
+        [FromBody] StockAvailableEventDto stockAvailable,
+        [FromServices] DaprClient daprClient)
+    {
+        _logger.LogInformation("Received stock-available event for product {ProductId} with stock {StockCount}", stockAvailable.ProductId, stockAvailable.StockCount);
+
+        // Find all pending orders for this product, oldest first
+        var pendingOrders = _orderService.GetAll()
+            .Where(o => o.ProductId == stockAvailable.ProductId && o.Status == "pending")
+            .OrderBy(o => o.CreatedAt)
+            .ToList();
+
+        int availableStock = stockAvailable.StockCount;
+
+        foreach (var order in pendingOrders)
+        {
+            if (order.Quantity <= availableStock)
+            {
+                // Fulfil the order
+                _orderService.UpdateStatus(order.Id, "fulfilled");
+                availableStock -= order.Quantity;
+
+                // Publish stock-updated event
+                var stockUpdatedEvent = new StockUpdatedEventDto
+                {
+                    OrderId = order.Id,
+                    ProductId = order.ProductId,
+                    Quantity = order.Quantity
+                };
+                await daprClient.PublishEventAsync("pubsub", "stock-updated", stockUpdatedEvent);
+
+                _logger.LogInformation("Order {OrderId} fulfilled and stock-updated event published", order.Id);
+
+                // Stop after fulfilling one order as per requirements
+                break;
+            }
+        }
+
+        return Ok();
     }
 
     [HttpPut("{id}/status")]

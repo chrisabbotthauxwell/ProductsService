@@ -47,5 +47,9 @@ if ([string]::IsNullOrEmpty($existingApp)) {
       --registry-server $ACR_REGISTRY_SERVER `
       --registry-username $ACR_USERNAME `
       --registry-password $ACR_PASSWORD `
+      --cpu 0.25 `
+      --memory 0.5Gi `
+      --min-replicas 1 `
+      --max-replicas 1 `
       --env-vars APPLICATIONINSIGHTS_CONNECTION_STRING=$APP_INSIGHTS_CONNECTION_STRING
 }

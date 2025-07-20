@@ -34,6 +34,7 @@ sequenceDiagram
   participant order-fulfilled topic
   participant order-backordered topic
   participant stock-available topic
+  participant stock-updated topic
 
   opt Place order
     Customer->>Orders service:create order
@@ -43,12 +44,12 @@ sequenceDiagram
     order-placed topic->>Products service: read order-placed topic
     Products service->>Products service: check stock for product
       alt in stock
-        Products service->>Products service: decrease StockCount for product
+        Products service->>Products service: decrease StockCount for product for ordered amount
         Products service->>order-fulfilled topic: publish order-fulfilled event
         order-fulfilled topic->>Orders service: read order-fulfilled event
         Orders service->>Orders service: update order status: "Fulfilled"
       else out of stock
-        Products service->>Products service: decrease StockCount for product
+        Products service->>Products service: decrease StockCount for product for ordered amount
         Products service->>order-backordered topic: publish order-backordered event
         order-backordered topic->>Orders service: read order-backordered event
         Orders service->>Orders service: update order status: "Pending"      
@@ -63,7 +64,10 @@ sequenceDiagram
       Orders service->>Orders service: find all Pending orders,\norder by oldest-first
       loop pending orders oldest-first
         Orders service->>Orders service: fulfill order if stock allows
+        Orders service->>stock-updated topic: publish stock-updated event
       end
+    stock-updated topic->>Products service: read stock-updated event
+    Products service->>Products service: decrease StockCount for product
     end
   end
 ```
@@ -75,8 +79,9 @@ The Products Service integrates with event topics using a pub/sub flow with a Da
 
 | Topic | Products service | Order service | Description |
 |-|-|-|-|
-| `stock-available` | Publish | Subscribe | Publish information about Product stock levels when a product is restocked |
-| `order-placed` | Subscribe | Publish | Publish information about newly placed orders |
+| `stock-available` | Publish | Subscribe | Publish information about Product stock levels when a product is restocked. Subscribe to know when pending orders can be fulfilled. |
+| `stock-updated` | Subscribe | Publish | Publish information about stock being used to fulfil an order. Subscribe to manage stock levels |
+| `order-placed` | Subscribe | Publish | Publish information about newly placed orders. Subscribe |
 | `order-fulfilled` | Publish | Subscribe | Publish that an order can be fulfilled based on order details and available stock |
 | `order-backordered` | Publish | Subscribe | Publish that an order cannot be fulfilled and is backordered based on order details and available stock |
 
