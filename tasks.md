@@ -24,7 +24,7 @@
 - [x] Docker: Containerise basic ProductsService
 - [x] Docker Compose: Configure containerisation for ProductsService stack (service + Dapr sidecar + redis streams)
 - [x] Logging locally to console
-- [ ] Logging to App Insights via Dapr Observability for ACA deployment
+- [x] Logging to App Insights via Dapr Observability for ACA deployment
 
 ## OrdersService
 - [x] Basic scaffolding for OrdersService
@@ -46,4 +46,5 @@
 - [x] Explore `az cli`
 - [x] Create script to deploy infrastructure
 - [x] Create script to deploy containerised ProductsService + Dapr sidecar
+- [ ] Update infrastructure script to create Service Bus topics for all event topics
 - [ ] Create script to deploy containerised OrdersService + Dapr sidecar

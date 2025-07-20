@@ -9,11 +9,11 @@ docker build --no-cache -t productsservice:latest ProductsService/.
 docker tag productsservice:latest $PRODUCTSSERVICE_IMAGE_NAME
 docker push $PRODUCTSSERVICE_IMAGE_NAME
 
-#$APP_INSIGHTS_CONNECTION_STRING = az monitor app-insights component show `
-#  --app $APP_INSIGHTS_NAME `
-#  --resource-group $RESOURCE_GROUP `
-#  --query connectionString `
-#  --output tsv
+$APP_INSIGHTS_CONNECTION_STRING = az monitor app-insights component show `
+  --app $APP_INSIGHTS_NAME `
+  --resource-group $RESOURCE_GROUP `
+  --query connectionString `
+  --output tsv
 
 # Check if the container app exists
 $existingApp = az containerapp show --name $PRODUCTSSERVICE_APP_NAME --resource-group $RESOURCE_GROUP --query name --output tsv 2>$null
@@ -36,8 +36,8 @@ if ([string]::IsNullOrEmpty($existingApp)) {
       --dapr-app-id $PRODUCTSSERVICE_APP_NAME `
       --dapr-app-port 8080 `
       --registry-username $ACR_USERNAME `
-      --registry-password $ACR_PASSWORD #`
-      #--env-vars APPLICATIONINSIGHTS_CONNECTION_STRING=$APP_INSIGHTS_CONNECTION_STRING
+      --registry-password $ACR_PASSWORD `
+      --env-vars APPLICATIONINSIGHTS_CONNECTION_STRING=$APP_INSIGHTS_CONNECTION_STRING
 } else {
     # Container app exists, update it
     az containerapp update `
@@ -46,6 +46,6 @@ if ([string]::IsNullOrEmpty($existingApp)) {
       --image $PRODUCTSSERVICE_IMAGE_NAME `
       --registry-server $ACR_REGISTRY_SERVER `
       --registry-username $ACR_USERNAME `
-      --registry-password $ACR_PASSWORD #`
-      #--env-vars APPLICATIONINSIGHTS_CONNECTION_STRING=$APP_INSIGHTS_CONNECTION_STRING
+      --registry-password $ACR_PASSWORD `
+      --env-vars APPLICATIONINSIGHTS_CONNECTION_STRING=$APP_INSIGHTS_CONNECTION_STRING
 }

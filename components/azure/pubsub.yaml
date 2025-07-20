@@ -2,7 +2,7 @@ componentType: pubsub.azure.servicebus
 version: v1
 metadata:
   - name: connectionString
-    value: "Endpoint=sb://sb-productsordersmanagement-cnalv2test-25.servicebus.windows.net/;SharedAccessKeyName=ManageSendListenPolicy;SharedAccessKey"
+    value: ""
   - name: topic
     value: "stock-available"
   - name: consumerID

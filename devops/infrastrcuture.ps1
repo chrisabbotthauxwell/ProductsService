@@ -17,14 +17,41 @@ if ([string]::IsNullOrEmpty($acrExists)) {
     Write-Host "ACR $ACR_NAME already exists."
 }
 
+# Log Analytics Workspace
+$LOG_ANALYTICS_WORKSPACE_ID = az monitor log-analytics workspace show --resource-group $RESOURCE_GROUP --workspace-name $LOG_ANALYTICS_NAME --query customerId -o tsv 2>$null
+
+if (-not $LOG_ANALYTICS_WORKSPACE_ID) {
+    Write-Host "Creating Log Analytics Workspace $LOG_ANALYTICS_NAME."
+    az monitor log-analytics workspace create --resource-group $RESOURCE_GROUP --workspace-name $LOG_ANALYTICS_NAME --location $LOCATION
+    $LOG_ANALYTICS_WORKSPACE_ID = az monitor log-analytics workspace show --resource-group $RESOURCE_GROUP --workspace-name $LOG_ANALYTICS_NAME --query customerId -o tsv
+} else {
+    Write-Host "Log Analytics Workspace $LOG_ANALYTICS_NAME already exists."
+}
+
+# App Insights
+$APP_INSIGHTS_EXISTS = az monitor app-insights component show --app $APP_INSIGHTS_NAME --resource-group $RESOURCE_GROUP --query name --output tsv 2>$null
+
+if (-not $APP_INSIGHTS_EXISTS) {
+    Write-Host "Creating Application Insights $APP_INSIGHTS_NAME."
+    az monitor app-insights component create `
+        --app $APP_INSIGHTS_NAME `
+        --location $LOCATION `
+        --resource-group $RESOURCE_GROUP `
+        --workspace $LOG_ANALYTICS_NAME
+} else {
+    Write-Host "Application Insights $APP_INSIGHTS_NAME already exists."
+}
+
 # Container Apps Environment
 $envExists = az containerapp env show --name $ENV_NAME --resource-group $RESOURCE_GROUP --query name --output tsv 2>$null
 if ([string]::IsNullOrEmpty($envExists)) {
     Write-Host "Creating Container Apps Environment $ENV_NAME."
-    az containerapp env create --name $ENV_NAME --resource-group $RESOURCE_GROUP --location $LOCATION
+    az containerapp env create --name $ENV_NAME --resource-group $RESOURCE_GROUP --location $LOCATION --logs-workspace-id $LOG_ANALYTICS_WORKSPACE_ID
     Write-Host "Container Apps Environment $ENV_NAME created."
 } else {
-    Write-Host "Container Apps Environment $ENV_NAME already exists."
+    Write-Host "Container Apps Environment $ENV_NAME already exists. Updating existing environment."
+    az containerapp env update --name $ENV_NAME --resource-group $RESOURCE_GROUP --logs-workspace-id $LOG_ANALYTICS_WORKSPACE_ID
+    Write-Host "Container Apps Environment $ENV_NAME updated."
 }
 
 # Service Bus Namespace
@@ -57,9 +84,16 @@ if ([string]::IsNullOrEmpty($sbRuleExists)) {
     Write-Host "Service Bus Authorization Rule ManageSendListenPolicy already exists."
 }
 
+# Connection String for  Service Bus Authorization Rule
+Write-Host "Retrieving primary connection string for Service Bus Authorization Rule ManageSendListenPolicy."
 $SB_CONNECTION_STRING = az servicebus namespace authorization-rule keys list --resource-group $RESOURCE_GROUP --namespace-name $SB_NAMESPACE --name ManageSendListenPolicy --query primaryConnectionString -o tsv
 
-# Optionally update pubsub.yaml with $SB_CONNECTION_STRING here
+# Set the service bus connection string as a secret in the Container Apps Environment
+# Write-Host "Setting Service Bus connection string as a secret in Container Apps Environment $ENV_NAME."
+# az containerapp env secret set --name $ENV_NAME --resource-group $RESOURCE_GROUP --secrets sb-connection-string=$SB_CONNECTION_STRING
+
+# Update pubsub.yaml with $SB_CONNECTION_STRING here
+# THIS IS A HACK!!! SHOULD BE USING KEY VAULT
 $pubsubPath = "components/azure/pubsub.yaml"
 $yaml = Get-Content $pubsubPath
 
@@ -71,7 +105,19 @@ for ($i = 0; $i -lt $yaml.Count; $i++) {
     }
 }
 $yaml | Set-Content $pubsubPath
-#az monitor app-insights component create --app $APP_INSIGHTS_NAME --location $LOCATION --resource-group $RESOURCE_GROUP
 
 Write-Host "Creating Dapr component $DAPR_COMPONENT_NAME."
 az containerapp env dapr-component set --name $ENV_NAME --resource-group $RESOURCE_GROUP --dapr-component-name $DAPR_COMPONENT_NAME --yaml $pubsubPath
+
+# Find the line with 'name: connectionString' and remove the connection string
+$yaml = Get-Content $pubsubPath
+
+# THIS IS A HACK!!! SHOULD BE USING KEY VAULT
+# Find the line with 'name: connectionString' and update the next line with the new value
+for ($i = 0; $i -lt $yaml.Count; $i++) {
+    if ($yaml[$i] -match 'name:\s*connectionString') {
+        $yaml[$i + 1] = "    value: `"`""
+        break
+    }
+}
+$yaml | Set-Content $pubsubPath
