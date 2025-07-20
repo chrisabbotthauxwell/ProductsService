@@ -14,6 +14,9 @@ builder.Services.AddSingleton<OrderService>();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+// Add Application Insights for telemetry
+builder.Services.AddApplicationInsightsTelemetry();
+
 builder.Logging.ClearProviders();
 builder.Logging.AddConsole();
 
