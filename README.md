@@ -49,7 +49,6 @@ sequenceDiagram
         order-fulfilled topic->>Orders service: read order-fulfilled event
         Orders service->>Orders service: update order status: "Fulfilled"
       else out of stock
-        Products service->>Products service: decrease StockCount for product for ordered amount
         Products service->>order-backordered topic: publish order-backordered event
         order-backordered topic->>Orders service: read order-backordered event
         Orders service->>Orders service: update order status: "Pending"      
@@ -72,7 +71,7 @@ sequenceDiagram
   end
 ```
 
-[Viewable externally on sequencediagram.org](https://sequencediagram.org/index.html#initialData=C4S2BsFMAIAUCcD2ATArgY2NAhgO2dAPLzKTzQC2e2A5pBZLsAFDPaaLkDCqAzsIgbw2HcgHVs8SAAtEfGAFlqdYcwAOk0OhAamREmV7ReZAG4h0kdZos68WTqXgBaNeHaQCAtRevwtdnoIKBjARibw5pZ+AboOBi4AZqjgiSDgUF6IPugxtnHQjmTOAEbsANZFUlk5edoF-Ijo5c7Yptjp2CVQ0N6+zDRIqGpw7paFCcw8jULOAHzETuFmFpAAXOhS2MAwVcyLhsYrlvMH8MuRq2sTTsbA23zXAESwY55PA0MjsKjdILzSaBqJBoTDOKqefYJC5RSDzKquN41CzXNS-cD-QEItweAiQUyMFjYpG9bIWebBUFhI6XSzXLYEYm40m1SmhGGrCkg9k02HXdDSSDNO5NcrQRKcIHczBscBYEC4EXNZhszAck5zVXUiJ86CkTaQbAmaAAZQEzS4cj0EvIwJCMq16rhcwRyVS6UyLJRQPRmJuxTdaQynmg+MJzFdKSDnr66FO0N5V2gDP9SSjHpDYaYUKWiY1Zyd12GyG2uwSdwevGeADF08HkB9IOBjXIHIkleUVdLtcdnY68+s9UKtsazaLLahrZK7VSu-ae7TnQiys0Icj0KjfQDU6UKmvQwTs8u9wkQ7H47mdUmU8fV6e8YeWAWBxfDle6dBi6XUxXgI9oC8jDIAqNCNvgzBARB4GfHI3zdh2n5qCWOzMBIUiyPI0BKLgtDFJq3aFohyEwI0wo2lK84wcMcBboCpEtG0HTuN0MAANpjhaVpYMA8B4LwYAgIguBGIkSAUNAgAmRAADKS0BzFJAC6rD9u+zr0a07SdCxXobmifzbupjFaT0WYsIZmnMT054LAmqlrCm5lMV0Vlkrkz6qa+5wDtcaT4DgGRwEBIGprwAA0AA6uBVNAJQAJ6FOApD8M4aTnCw4CINkQJBbgNAhQlSXAClIBpTmb69p5hGBh6P4gO29H+RlADuvCsJB7X4EAA)
+[Viewable externally on www.mermaidchart.com](https://www.mermaidchart.com/play#pako:eNqtVUuu1DAQvEorayK9dRazeYgd4kksWBAWHrszY41jG38GIcQBuAcn4yQ4sTP52fNGiFWidHV1u7ra-VFRxbBqKotfPUqKbzk5GdK3EsBxJxBejGKeOiCSwQfD0EBPJDlhj9K1csAR6pSBZ2-d6tHMXz4Rg2flLcL7McNEuCbGcco1kS4SWrBorpziNqqGaK0FocjAKc3pFpGae4Wh86LjQpRIIuhI6GV8K8HC8eilJlfCBTkGYe6AvGbEzTwDSOnQ7XCSWG74BDfN6sNhrURDDQaGJXYN2GdEbGiAOG8baKuxGmurmD7W90fB7Rl0VK1Oxy3w79VvQCeGVQyvoxXGKrucQLQdUgPhcKwwXdjNNMtAz0gvUW3ogtfSkSJDMKBwwGWMT98eZGY4aB9M-3FIflY-THVRYXyffEL6IXy3QNaBWyHn8ELLWc9Ndmb2C0GLXK8aKLp256N3E-FkJQAUQR_lw-p0D2hc2K-tCEtAVoYdw30h7vD9qxQvKBmXp7aKNDc5ZNqh9JIe48ol10SnRtqI3d2OWTemRgpGXy719nr6vPCvM0Ra7riSFjqjevjz6_dT0BAOT1-mQ2QGl73xGl0ouNI4m7oXehxX8WJ9aFQdDz8mIgSk4cSh2TdtK-P4jt9BCYbW1R039tahUEqDXuVkcY-0EDck2YWnnRiaUt_sHZ7Mz2JeinVwJe7NbxmC8n1bJPwf1-LW_9XPv8y09kU)
 
 ## Event-driven integrations
 The Products Service integrates with event topics using a pub/sub flow with a Dapr sidecar:

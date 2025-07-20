@@ -81,7 +81,7 @@ public class OrdersController : ControllerBase
         // Find all pending orders for this product, oldest first
         var pendingOrders = _orderService.GetAll()
             .Where(o => o.ProductId == stockAvailable.ProductId && o.Status == "pending")
-            .OrderBy(o => o.CreatedAt)
+            .OrderBy(o => o.UpdatedAt)
             .ToList();
 
         int availableStock = stockAvailable.StockCount;
@@ -106,7 +106,7 @@ public class OrdersController : ControllerBase
                 _logger.LogInformation("Order {OrderId} fulfilled and stock-updated event published", order.Id);
 
                 // Stop after fulfilling one order as per requirements
-                break;
+                // break;
             }
             else
             {
