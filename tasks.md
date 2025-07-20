@@ -21,7 +21,7 @@
 - [ ] Subscribe to and handle `order-placed` event
 - [ ] Logic for order fulfilled for order + publish `order-fulfilled` event
 - [ ] Logic for back ordered orders + publish `order-backordered` event
-- [ ] Update Azure pubsub.yaml component definition to allow both productsservice & ordersservice to access the same topics
+- [x] Update Azure pubsub.yaml component definition to allow both productsservice & ordersservice to access the same topics
 - [x] Integrate Dapr for pubsub
 - [x] Docker: Containerise basic ProductsService
 - [x] Docker Compose: Configure containerisation for ProductsService stack (service + Dapr sidecar + redis streams)
@@ -42,12 +42,12 @@
 - [x] Docker: Containerise basic OrdersService
 - [x] Docker Compose: Configure containerisation for OrdersService stack (service + Dapr sidecar + redis streams)
 - [x] Logging locally to console
-- [ ] Logging to App Insights via Dapr Observability for ACA deployment
+- [x] Logging to App Insights via Dapr Observability for ACA deployment
 
 ## DevOps
 - [x] Explore `azd`
 - [x] Explore `az cli`
 - [x] Create script to deploy infrastructure
 - [x] Create script to deploy containerised ProductsService + Dapr sidecar
-- [ ] Update infrastructure script to create Service Bus topics for all event topics
-- [ ] Create script to deploy containerised OrdersService + Dapr sidecar
+- [x] Update infrastructure script to create Service Bus topics for all event topics
+- [x] Create script to deploy containerised OrdersService + Dapr sidecar

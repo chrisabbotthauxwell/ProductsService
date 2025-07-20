@@ -64,7 +64,7 @@ if ([string]::IsNullOrEmpty($sbNamespaceExists)) {
     Write-Host "Service Bus Namespace $SB_NAMESPACE already exists."
 }
 
-# Service Bus Topic
+# Service Bus Topic stock-available
 $sbTopicExists = az servicebus topic show --resource-group $RESOURCE_GROUP --namespace-name $SB_NAMESPACE --name $SB_TOPIC_STOCK_AVAILABLE --query name --output tsv 2>$null
 if ([string]::IsNullOrEmpty($sbTopicExists)) {
     Write-Host "Creating Service Bus Topic $SB_TOPIC_STOCK_AVAILABLE."
@@ -72,6 +72,46 @@ if ([string]::IsNullOrEmpty($sbTopicExists)) {
     Write-Host "Service Bus Topic $SB_TOPIC_STOCK_AVAILABLE created."
 } else {
     Write-Host "Service Bus Topic $SB_TOPIC_STOCK_AVAILABLE already exists."
+}
+
+# Service Bus Topic stock-updated
+$sbTopicExists = az servicebus topic show --resource-group $RESOURCE_GROUP --namespace-name $SB_NAMESPACE --name $SB_TOPIC_STOCK_UPDATED --query name --output tsv 2>$null
+if ([string]::IsNullOrEmpty($sbTopicExists)) {
+    Write-Host "Creating Service Bus Topic $SB_TOPIC_STOCK_UPDATED."
+    az servicebus topic create --resource-group $RESOURCE_GROUP --namespace-name $SB_NAMESPACE --name $SB_TOPIC_STOCK_UPDATED
+    Write-Host "Service Bus Topic $SB_TOPIC_STOCK_UPDATED created."
+} else {
+    Write-Host "Service Bus Topic $SB_TOPIC_STOCK_UPDATED already exists."
+}
+
+# Service Bus Topic order-placed
+$sbTopicExists = az servicebus topic show --resource-group $RESOURCE_GROUP --namespace-name $SB_NAMESPACE --name $SB_TOPIC_ORDER_PLACED --query name --output tsv 2>$null
+if ([string]::IsNullOrEmpty($sbTopicExists)) {  
+    Write-Host "Creating Service Bus Topic $SB_TOPIC_ORDER_PLACED."
+    az servicebus topic create --resource-group $RESOURCE_GROUP --namespace-name $SB_NAMESPACE --name $SB_TOPIC_ORDER_PLACED
+    Write-Host "Service Bus Topic $SB_TOPIC_ORDER_PLACED created."
+} else {
+    Write-Host "Service Bus Topic $SB_TOPIC_ORDER_PLACED already exists."
+}
+
+# Service Bus Topic order-fulfilled
+$sbTopicExists = az servicebus topic show --resource-group $RESOURCE_GROUP --namespace-name $SB_NAMESPACE --name $SB_TOPIC_ORDER_FULFILLED --query name --output tsv 2>$null
+if ([string]::IsNullOrEmpty($sbTopicExists)) { 
+    Write-Host "Creating Service Bus Topic $SB_TOPIC_ORDER_FULFILLED."
+    az servicebus topic create --resource-group $RESOURCE_GROUP --namespace-name $SB_NAMESPACE --name $SB_TOPIC_ORDER_FULFILLED
+    Write-Host "Service Bus Topic $SB_TOPIC_ORDER_FULFILLED created."
+} else {
+    Write-Host "Service Bus Topic $SB_TOPIC_ORDER_FULFILLED already exists."
+}
+
+# Service Bus Topic order-backordered
+$sbTopicExists = az servicebus topic show --resource-group $RESOURCE_GROUP --namespace-name $SB_NAMESPACE --name $SB_TOPIC_ORDER_BACKORDERED --query name --output tsv 2>$null
+if ([string]::IsNullOrEmpty($sbTopicExists)) {
+    Write-Host "Creating Service Bus Topic $SB_TOPIC_ORDER_BACKORDERED."
+    az servicebus topic create --resource-group $RESOURCE_GROUP --namespace-name $SB_NAMESPACE --name $SB_TOPIC_ORDER_BACKORDERED
+    Write-Host "Service Bus Topic $SB_TOPIC_ORDER_BACKORDERED created."
+} else {
+    Write-Host "Service Bus Topic $SB_TOPIC_ORDER_BACKORDERED already exists."
 }
 
 # Service Bus Authorization Rule
@@ -98,6 +138,7 @@ $pubsubPath = "components/azure/pubsub.yaml"
 $yaml = Get-Content $pubsubPath
 
 # Find the line with 'name: connectionString' and update the next line with the new value
+Write-Host "Applying service bus connection string to Dapr pubsub.yaml: $SB_CONNECTION_STRING."
 for ($i = 0; $i -lt $yaml.Count; $i++) {
     if ($yaml[$i] -match 'name:\s*connectionString') {
         $yaml[$i + 1] = "    value: `"$SB_CONNECTION_STRING`""
@@ -114,6 +155,7 @@ $yaml = Get-Content $pubsubPath
 
 # THIS IS A HACK!!! SHOULD BE USING KEY VAULT
 # Find the line with 'name: connectionString' and update the next line with the new value
+Write-Host "Removing service bus connection string from Dapr pubsub.yaml."
 for ($i = 0; $i -lt $yaml.Count; $i++) {
     if ($yaml[$i] -match 'name:\s*connectionString') {
         $yaml[$i + 1] = "    value: `"`""

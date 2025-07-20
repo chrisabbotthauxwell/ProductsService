@@ -1,11 +1,9 @@
+# Azure pubsub config
 componentType: pubsub.azure.servicebus
 version: v1
 metadata:
   - name: connectionString
     value: ""
-  - name: topic
-    value: "stock-available"
-  - name: consumerID
-    value: "productsservice"
 scopes:
   - productsservice
+  - ordersservice
