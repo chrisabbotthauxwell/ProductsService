@@ -6,6 +6,16 @@ az login
 Write-Host "Creating Resource Group $RESOURCE_GROUP."
 az group create --name $RESOURCE_GROUP --location $LOCATION
 
+# Azure Key Vault
+#$kvExists = az keyvault show --name $KEY_VAULT_NAME --resource-group $RESOURCE_GROUP --query name --output tsv 2>$null
+#if ([string]::IsNullOrEmpty($kvExists)) {
+#    Write-Host "Creating Key Vault $KEY_VAULT_NAME."
+#    az keyvault create --name $KEY_VAULT_NAME --resource-group $RESOURCE_GROUP --location $LOCATION
+#    Write-Host "Key Vault $KEY_VAULT_NAME created."
+#} else {
+#    Write-Host "Key Vault $KEY_VAULT_NAME already exists."
+#}
+
 # Azure Container Registry
 $acrExists = az acr show --name $ACR_NAME --resource-group $RESOURCE_GROUP --query name --output tsv 2>$null
 if ([string]::IsNullOrEmpty($acrExists)) {
@@ -42,17 +52,29 @@ if (-not $APP_INSIGHTS_EXISTS) {
     Write-Host "Application Insights $APP_INSIGHTS_NAME already exists."
 }
 
+# Get App Insights connection string
+$APP_INSIGHTS_CONNECTION_STRING = az monitor app-insights component show `
+  --app $APP_INSIGHTS_NAME `
+  --resource-group $RESOURCE_GROUP `
+  --query connectionString `
+  --output tsv
+
 # Container Apps Environment
 $envExists = az containerapp env show --name $ENV_NAME --resource-group $RESOURCE_GROUP --query name --output tsv 2>$null
 if ([string]::IsNullOrEmpty($envExists)) {
     Write-Host "Creating Container Apps Environment $ENV_NAME."
-    az containerapp env create --name $ENV_NAME --resource-group $RESOURCE_GROUP --location $LOCATION --logs-workspace-id $LOG_ANALYTICS_WORKSPACE_ID
+    az containerapp env create --name $ENV_NAME --resource-group $RESOURCE_GROUP --location $LOCATION --logs-workspace-id $LOG_ANALYTICS_WORKSPACE_ID --dapr-connection-string $APP_INSIGHTS_CONNECTION_STRING
     Write-Host "Container Apps Environment $ENV_NAME created."
 } else {
     Write-Host "Container Apps Environment $ENV_NAME already exists. Updating existing environment."
     az containerapp env update --name $ENV_NAME --resource-group $RESOURCE_GROUP --logs-workspace-id $LOG_ANALYTICS_WORKSPACE_ID
     Write-Host "Container Apps Environment $ENV_NAME updated."
 }
+
+# Set Container Apps Environment OpenTelemetry collector
+Write-Host "Setting OpenTelemetry collector for Container Apps Environment $ENV_NAME."
+az containerapp env telemetry app-insights set --name $ENV_NAME --resource-group $RESOURCE_GROUP --connection-string $APP_INSIGHTS_CONNECTION_STRING --enable-open-telemetry-traces true --enable-open-telemetry-logs true
+Write-Host "OpenTelemetry collector set for Container Apps Environment $ENV_NAME."
 
 # Service Bus Namespace
 $sbNamespaceExists = az servicebus namespace show --name $SB_NAMESPACE --resource-group $RESOURCE_GROUP --query name --output tsv 2>$null

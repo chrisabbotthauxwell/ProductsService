@@ -1,4 +1,5 @@
 using ProductsService.Services;
+using Azure.Monitor.OpenTelemetry.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,14 +16,28 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 // Add Application Insights for telemetry
-builder.Services.AddApplicationInsightsTelemetry();
+if (builder.Environment.IsProduction())
+{
+    var appInsightsConnectionString = Environment.GetEnvironmentVariable("APPLICATIONINSIGHTS_CONNECTION_STRING");
+    if (!string.IsNullOrEmpty(appInsightsConnectionString))
+    {
+        builder.Services.AddApplicationInsightsTelemetry(options =>
+        {
+            options.ConnectionString = appInsightsConnectionString;
+        });
+        builder.Services.AddOpenTelemetry().UseAzureMonitor(options => {
+            options.ConnectionString = appInsightsConnectionString;
+        });
+    }
+}
 
-builder.Logging.ClearProviders();
+Console.WriteLine($"ASPNETCORE_ENVIRONMENT: {builder.Environment.EnvironmentName}");
+
 builder.Logging.AddConsole();
 
 //builder.Services.AddHttpLogging(logging =>
 //{
-//    logging.LoggingFields = Microsoft.AspNetCore.HttpLogging.HttpLoggingFields.All;
+//   logging.LoggingFields = Microsoft.AspNetCore.HttpLogging.HttpLoggingFields.All;
 //});
 
 var app = builder.Build();

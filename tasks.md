@@ -27,6 +27,7 @@
 - [x] Docker Compose: Configure containerisation for ProductsService stack (service + Dapr sidecar + redis streams)
 - [x] Logging locally to console
 - [x] Logging to App Insights via Dapr Observability for ACA deployment
+- [x] Enable distributed tracing
 
 ## OrdersService
 - [x] Basic scaffolding for OrdersService
@@ -43,6 +44,7 @@
 - [x] Docker Compose: Configure containerisation for OrdersService stack (service + Dapr sidecar + redis streams)
 - [x] Logging locally to console
 - [x] Logging to App Insights via Dapr Observability for ACA deployment
+- [x] Enable distributed tracing
 
 ## DevOps
 - [x] Explore `azd`
@@ -51,6 +53,7 @@
 - [x] Create script to deploy containerised ProductsService + Dapr sidecar
 - [x] Update infrastructure script to create Service Bus topics for all event topics
 - [x] Create script to deploy containerised OrdersService + Dapr sidecar
+- [x] Enable distributed tracing
 
 ## Testing
 - [x] Unit testing (xUnit)

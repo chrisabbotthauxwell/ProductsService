@@ -17,11 +17,15 @@ docker build --no-cache -t ordersservice:latest OrdersService/.
 docker tag ordersservice:latest $ORDERSSERVICE_IMAGE_NAME
 docker push $ORDERSSERVICE_IMAGE_NAME
 
+# Get App Insights connection string
 $APP_INSIGHTS_CONNECTION_STRING = az monitor app-insights component show `
   --app $APP_INSIGHTS_NAME `
   --resource-group $RESOURCE_GROUP `
   --query connectionString `
   --output tsv
+
+# Store connection string in Key Vault
+# az keyvault secret set --vault-name $KEY_VAULT_NAME --name "AppInsightsConnectionString" --value $APP_INSIGHTS_CONNECTION_STRING
 
 # Check if the ProductsService container app exists
 $existingApp = az containerapp show --name $PRODUCTSSERVICE_APP_NAME --resource-group $RESOURCE_GROUP --query name --output tsv 2>$null
