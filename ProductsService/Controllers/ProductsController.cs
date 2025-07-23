@@ -49,7 +49,7 @@ public class ProductsController : ControllerBase
             [FromBody] ProductUpdateDto update,
             [FromServices] DaprClient daprClient)
     {
-        _logger.LogInformation("Updating stock for product {ProductId} to {StockCount}", id, update.StockCount);
+        _logger.LogInformation("Updating stock for product: {ProductId} to: {StockCount}", id, update.StockCount);
         try
         {
             // update stock for product
@@ -70,7 +70,7 @@ public class ProductsController : ControllerBase
                     };
 
                     await daprClient.PublishEventAsync("pubsub", "stock-available", stockAvailableEvent);
-                    _logger.LogInformation("Published stock-available event for product {ProductId}", product.Id);
+                    _logger.LogInformation("Published stock-available event for product: {ProductId}", product.Id);
                 }
                 return NoContent();
             }
@@ -92,7 +92,7 @@ public class ProductsController : ControllerBase
     [Topic("pubsub", "stock-updated")]
     public IActionResult OnStockUpdated([FromBody] StockUpdatedEventDto stockUpdated)
     {
-        _logger.LogInformation("Received stock-updated event for product {ProductId}, quantity {Quantity}, order {OrderId}", stockUpdated.ProductId, stockUpdated.Quantity, stockUpdated.OrderId);
+        _logger.LogInformation("Received stock-updated event for product: {ProductId}, quantity: {Quantity}, order: {OrderId}", stockUpdated.ProductId, stockUpdated.Quantity, stockUpdated.OrderId);
 
         var product = _productService.GetById(stockUpdated.ProductId);
         if (product is null)
@@ -106,7 +106,7 @@ public class ProductsController : ControllerBase
         if (newStockCount < 0) newStockCount = 0;
         _productService.UpdateStock(product.Id, newStockCount);
 
-        _logger.LogInformation("Product {ProductId} stock decreased by {Quantity}, new stock: {StockCount}", product.Id, stockUpdated.Quantity, newStockCount);
+        _logger.LogInformation("Product {ProductId} stock decreased by: {Quantity}, new stock: {StockCount}", product.Id, stockUpdated.Quantity, newStockCount);
 
         return Ok();
     }
@@ -118,7 +118,7 @@ public class ProductsController : ControllerBase
         [FromBody] OrderPlacedEventDto orderPlaced,
         [FromServices] DaprClient daprClient)
     {
-        _logger.LogInformation("Received order-placed event for order {OrderId}, product {ProductId}, quantity {Quantity}", orderPlaced.OrderId, orderPlaced.ProductId, orderPlaced.Quantity);
+        _logger.LogInformation("Received order-placed event for order: {OrderId}, product: {ProductId}, quantity: {Quantity}", orderPlaced.OrderId, orderPlaced.ProductId, orderPlaced.Quantity);
 
         var product = _productService.GetById(orderPlaced.ProductId);
         if (product is null)
@@ -132,14 +132,14 @@ public class ProductsController : ControllerBase
         {
             if (product.StockCount >= orderPlaced.Quantity)
             {
-                _logger.LogInformation("Product {ProductId} is in stock for order {OrderId}", product.Id, orderPlaced.OrderId);
+                _logger.LogInformation("Product: {ProductId} is in stock for order: {OrderId}", product.Id, orderPlaced.OrderId);
 
                 // Decrease stock count by the ordered quantity
                 var newStockCount = product.StockCount - orderPlaced.Quantity;
                 if (newStockCount < 0) newStockCount = 0;
                 _productService.UpdateStock(product.Id, newStockCount);
 
-                _logger.LogInformation("Product {ProductId} stock decreased by {Quantity}, new stock: {StockCount}", product.Id, orderPlaced.Quantity, newStockCount);
+                _logger.LogInformation("Product: {ProductId} stock decreased by: {Quantity}, new stock: {StockCount}", product.Id, orderPlaced.Quantity, newStockCount);
 
                 // Publish order-fulfilled event
                 var orderFulfilledEvent = new OrderFulfilledEventDto
@@ -149,12 +149,13 @@ public class ProductsController : ControllerBase
                     Quantity = orderPlaced.Quantity,
                     FulfilledDateTime = DateTime.UtcNow
                 };
+                _logger.LogInformation("Publishing order-fulfilled event for order: {OrderId}", orderPlaced.OrderId);
                 await daprClient.PublishEventAsync("pubsub", "order-fulfilled", orderFulfilledEvent);
-                _logger.LogInformation("Published order-fulfilled event for order {OrderId}", orderPlaced.OrderId);
+                _logger.LogInformation("Published order-fulfilled event for order: {OrderId}", orderPlaced.OrderId);
             }
             else
             {
-                _logger.LogWarning("Not enough stock for order {OrderId}, available stock: {StockCount}", orderPlaced.OrderId, product.StockCount);
+                _logger.LogWarning("Not enough stock for order: {OrderId}, available stock: {StockCount}", orderPlaced.OrderId, product.StockCount);
 
                 // Publish order-backordered event
                 var orderBackorderedEvent = new OrderBackorderedEventDto
@@ -164,13 +165,14 @@ public class ProductsController : ControllerBase
                     Quantity = orderPlaced.Quantity,
                     BackorderedDateTime = DateTime.UtcNow
                 };
+                _logger.LogInformation("Publishing order-backordered event for order: {OrderId}", orderPlaced.OrderId);
                 await daprClient.PublishEventAsync("pubsub", "order-backordered", orderBackorderedEvent);
-                _logger.LogInformation("Published order-backordered event for order {OrderId}", orderPlaced.OrderId);
+                _logger.LogInformation("Published order-backordered event for order: {OrderId}", orderPlaced.OrderId);
             }   
         }
         else
         {
-            _logger.LogWarning("Product {ProductId} is out of stock for order {OrderId}", product.Id, orderPlaced.OrderId);
+            _logger.LogWarning("Product: {ProductId} is out of stock for order: {OrderId}", product.Id, orderPlaced.OrderId);
 
             //Publish order-backordered event
             var orderBackorderedEvent = new OrderBackorderedEventDto
@@ -180,8 +182,9 @@ public class ProductsController : ControllerBase
                 Quantity = orderPlaced.Quantity,
                 BackorderedDateTime = DateTime.UtcNow
             };
+            _logger.LogInformation("Publishing order-backordered event for order: {OrderId}", orderPlaced.OrderId);
             await daprClient.PublishEventAsync("pubsub", "order-backordered", orderBackorderedEvent);
-            _logger.LogInformation("Published order-backordered event for order {OrderId}", orderPlaced.OrderId);
+            _logger.LogInformation("Published order-backordered event for order: {OrderId}", orderPlaced.OrderId);
         }
 
         return Ok();

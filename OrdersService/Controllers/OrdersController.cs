@@ -48,7 +48,7 @@ public class OrdersController : ControllerBase
         [FromBody] OrderCreateDto dto,
         [FromServices] DaprClient daprClient)
     {
-        _logger.LogInformation("Creating order for product {ProductId} with quantity {Quantity}", dto.ProductId, dto.Quantity);
+        _logger.LogInformation("Creating order for product: {ProductId} with quantity: {Quantity}", dto.ProductId, dto.Quantity);
         try
         {
             var order = _orderService.Create(dto.ProductId, dto.Quantity);
@@ -64,7 +64,7 @@ public class OrdersController : ControllerBase
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error creating order for product {ProductId}", dto.ProductId);
+            _logger.LogError(ex, "Error creating order for product: {ProductId}", dto.ProductId);
             throw;
         }
     }
@@ -76,7 +76,7 @@ public class OrdersController : ControllerBase
         [FromBody] StockAvailableEventDto stockAvailable,
         [FromServices] DaprClient daprClient)
     {
-        _logger.LogInformation("Received stock-available event for product {ProductId} with stock {StockCount}", stockAvailable.ProductId, stockAvailable.StockCount);
+        _logger.LogInformation("Received stock-available event for product: {ProductId} with stock: {StockCount}", stockAvailable.ProductId, stockAvailable.StockCount);
 
         // Find all pending orders for this product, oldest first
         var pendingOrders = _orderService.GetAll()
@@ -101,9 +101,10 @@ public class OrdersController : ControllerBase
                     ProductId = order.ProductId,
                     Quantity = order.Quantity
                 };
+                _logger.LogInformation("Publishing stock-updated event for order: {OrderId}", order.Id);
                 await daprClient.PublishEventAsync("pubsub", "stock-updated", stockUpdatedEvent);
 
-                _logger.LogInformation("Order {OrderId} fulfilled and stock-updated event published", order.Id);
+                _logger.LogInformation("Order: {OrderId} fulfilled and stock-updated event published", order.Id);
 
                 // Stop after fulfilling one order as per requirements
                 // break;
@@ -111,7 +112,7 @@ public class OrdersController : ControllerBase
             else
             {
                 // Not enough stock to fulfil this order, skip it
-                _logger.LogInformation("Not enough stock to fulfil order {OrderId}, skipping", order.Id);
+                _logger.LogInformation("Not enough stock to fulfil order: {OrderId}, skipping", order.Id);
 
                 // Update order updatedAt timestamp
                 _orderService.UpdateUpdatedAt(order.Id, DateTime.UtcNow);
@@ -140,7 +141,7 @@ public class OrdersController : ControllerBase
         else
         {
             _orderService.UpdateStatus(order.Id, "fulfilled");
-            _logger.LogInformation("Order {OrderId} is fulfilled", orderFulfilled.OrderId);
+            _logger.LogInformation("Order: {OrderId} is fulfilled", orderFulfilled.OrderId);
         }
 
         return Ok();
@@ -153,7 +154,7 @@ public class OrdersController : ControllerBase
         [FromBody] OrderBackorderedEventDto orderBackordered,
         [FromServices] DaprClient daprClient)
     {
-        _logger.LogInformation("Received order-backordered event for order {OrderId}, product {ProductId}, quantity {Quantity}", orderBackordered.OrderId, orderBackordered.ProductId, orderBackordered.Quantity);
+        _logger.LogInformation("Received order-backordered event for order: {OrderId}, product: {ProductId}, quantity: {Quantity}", orderBackordered.OrderId, orderBackordered.ProductId, orderBackordered.Quantity);
 
         // Logic to handle backordered orders can be added here if needed
         var order = _orderService.GetById(orderBackordered.OrderId);
@@ -165,7 +166,7 @@ public class OrdersController : ControllerBase
         else
         {
             _orderService.UpdateStatus(order.Id, "pending");
-            _logger.LogInformation("Order {OrderId} is backordered", orderBackordered.OrderId);
+            _logger.LogInformation("Order: {OrderId} is backordered", orderBackordered.OrderId);
         }
 
         return Ok();
@@ -174,7 +175,7 @@ public class OrdersController : ControllerBase
     [HttpPut("{id}/status")]
     public IActionResult UpdateStatus(string id, [FromBody] string status)
     {
-        _logger.LogInformation("Updating status for order {OrderId} to {Status}", id, status);
+        _logger.LogInformation("Updating status for order: {OrderId} to: {Status}", id, status);
         var updated = _orderService.UpdateStatus(id, status);
         if (!updated)
         {

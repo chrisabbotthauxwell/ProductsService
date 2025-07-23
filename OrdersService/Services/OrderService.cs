@@ -75,7 +75,7 @@ public class OrderService
             UpdatedAt = now
         };
         _orders.Add(order);
-        _logger.LogInformation("Created new order {OrderId} for product {ProductId} with quantity {Quantity}", order.Id, productId, quantity);
+        _logger.LogInformation("Created new order: {OrderId} for product: {ProductId} with quantity: {Quantity}", order.Id, productId, quantity);
         return order;
     }
 
@@ -84,7 +84,7 @@ public class OrderService
         var order = GetById(orderId);
         if (order is not null)
         {
-            _logger.LogInformation("Updating status for order {OrderId} to {Status}", orderId, status);
+            _logger.LogInformation("Updating status for order: {OrderId} to: {Status}", orderId, status);
             order.Status = status;
             order.UpdatedAt = DateTime.UtcNow;
         }
@@ -100,7 +100,7 @@ public class OrderService
         var order = GetById(orderId);
         if (order is not null)
         {
-            _logger.LogInformation("Updating updatedAt for order {OrderId} to {UpdatedAt}", orderId, updatedAt);
+            _logger.LogInformation("Updating updatedAt for order: {OrderId} to: {UpdatedAt}", orderId, updatedAt);
             order.UpdatedAt = updatedAt;
         }
         else

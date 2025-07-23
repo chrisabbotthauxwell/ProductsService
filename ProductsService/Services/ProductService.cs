@@ -41,7 +41,7 @@ public class ProductService
         var product = GetById(id);
         if (product is not null)
         {
-            _logger.LogInformation("Updating stock for product {ProductId} to {StockCount}", id, newStockCount);
+            _logger.LogInformation("Updating stock for product: {ProductId} to: {StockCount}", id, newStockCount);
             product.StockCount = newStockCount;
         }
         else
