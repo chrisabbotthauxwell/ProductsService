@@ -98,6 +98,19 @@ A Warehosue Manager can update the stock level for a given product using the Pro
 
 The Orders Service subscribes to the `stock-available` topic and will update any `pending` orders if there is now enough available stock to fulfil them.
 
+### Stock updated
+When stock is used to fulfil an order, inventory levels must be updated to reflect the remaining stock.
+
+the Orders Service will publish a `stock-updated` event indicating the new stock level for a given product.
+
+```json
+{
+  "orderId": "o001",
+  "productid": "p001",
+  "quantity": 5
+}
+```
+
 ### Order placed
 When a Customer places an order through the Orders Service, an event is published to the `order-placed` topic.
 
@@ -345,38 +358,65 @@ Dual-mode logging strategy for local debugging and deployment to Azure Container
 - Dapr sidecars in ACA automatically export logs, metrics, and traces to Azure Monitor/App Insights.
 - For distributed tracing, logs should correlation IDs or trace context. This is supported by default when using Dapr and App Insights. No extra code is needed, console output must be JSON.
 
-# Code changes
+## Code changes
 Trunk based development -> Commit changes to `main` and push to origin
 
-# Build container image
+## Build container image
 ```
 docker build --no-cache -t productsservice:latest .
 ```
 
-# Deploy infrastrcture and app to Azure
+## Deploy infrastrcture and app to Azure
 Build and deployment is handled using `Powershell` scripts in the `/devops/` folder which are run from the commandline in the solution root.
 
 Three scripts are prepared:
-## 1. Deployment variables
+### 1. Deployment variables
 `.\devops\variables.ps1` defines deployment variables for the deployment.
 
 Increment the `$ATTEMPT_NO` value to reflect the deployment version.
 
-## 2. Deploy infrastrcture
+### 2. Deploy infrastrcture
 From the solution root folder in a Powershell terminal, run:
 ```bash
 .\devops\infrastrcuture.ps1
 ```
 This will create the required Azure services ready for app deployment.
 
-## Build app image and deploy to ACA
+### 3.Build app image and deploy to ACA
 From the solution root folder in a Powershell terminal, run:
 ```
 .\devops\deploy-app.ps1
 ```
 This will create or update a Azure Container App.
 
-# Future CI/CD
+## Testing
+The test strategy for this system includes the following stages:
+- Unit Testing
+- Automated functional/integration testing
+- Containerised Testing
+- API Contract Testing
+
+### Unit testing
+- Test business logic in isolation (e.g., services, models).
+- Technology: xUnit for .NET.
+- Automated Functional/Integration Testing
+
+```pwsh
+dotnet test OrdersService.Tests
+
+dotnet test ProductsService.Tests
+```
+
+### Automated functional/integration testing
+- Test API endpoints and event-driven flows (Dapr pub/sub).
+- Technology: ASP.NET Core WebApplicationFactory for integration tests, FluentAssertions for expressive assertions.
+- For Dapr event flows, use Dapr Test Framework or mock Dapr sidecar with TestContainers for Docker-based integration.
+
+### API Contract testing
+- Validate OpenAPI/Swagger definitions.
+- Technology: Swashbuckle.AspNetCore and NSwag for client/server contract validation.
+
+## Future CI/CD
 - Use Github PR process for merges to origin
     - Automate PRs using GenAI code review agent
     - Automate code quality checks

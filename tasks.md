@@ -51,3 +51,9 @@
 - [x] Create script to deploy containerised ProductsService + Dapr sidecar
 - [x] Update infrastructure script to create Service Bus topics for all event topics
 - [x] Create script to deploy containerised OrdersService + Dapr sidecar
+
+## Testing
+- [x] Unit testing (xUnit)
+- [ ] Automated functional/integration testing (ASP.NET Core WebApplicationFactory + FluentAssertions. Dapr Test Framework)
+- [ ] Containerised testing (TestContainers for .NET)
+- [ ] API contract testing (Swashbuckle.AspNetCore, NSwag)
