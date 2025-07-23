@@ -393,7 +393,6 @@ This will create or update a Azure Container App.
 The test strategy for this system includes the following stages:
 - Unit Testing
 - Automated functional/integration testing
-- Containerised Testing
 - API Contract Testing
 
 ### Unit testing
@@ -422,6 +421,12 @@ dotnet test ProductsOrdersManagement.IntegrationTests
 - Validate OpenAPI/Swagger definitions.
 - Technology: Swashbuckle.AspNetCore and NSwag for client/server contract validation.
 
+```pwsh
+docker compose up --build
+
+dotnet test ProductsOrdersManagement.IntegrationTests
+```
+
 ## Future CI/CD
 - Use Github PR process for merges to origin
     - Automate PRs using GenAI code review agent
@@ -430,5 +435,3 @@ dotnet test ProductsOrdersManagement.IntegrationTests
 - On merge to `main`
     - Automate creation new Docker image and push to ACR
     - Automate creation of new revision microservice and deploy new image
-
-# 
