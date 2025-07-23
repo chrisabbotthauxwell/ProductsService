@@ -54,6 +54,6 @@
 
 ## Testing
 - [x] Unit testing (xUnit)
-- [ ] Automated functional/integration testing (ASP.NET Core WebApplicationFactory + FluentAssertions. Dapr Test Framework)
+- [x] Automated functional/integration testing (ASP.NET Core WebApplicationFactory + FluentAssertions. Dapr Test Framework)
 - [ ] Containerised testing (TestContainers for .NET)
 - [ ] API contract testing (Swashbuckle.AspNetCore, NSwag)

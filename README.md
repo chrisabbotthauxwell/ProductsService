@@ -412,6 +412,12 @@ dotnet test ProductsService.Tests
 - Technology: ASP.NET Core WebApplicationFactory for integration tests, FluentAssertions for expressive assertions.
 - For Dapr event flows, use Dapr Test Framework or mock Dapr sidecar with TestContainers for Docker-based integration.
 
+```pwsh
+docker compose up --build
+
+dotnet test ProductsOrdersManagement.IntegrationTests
+```
+
 ### API Contract testing
 - Validate OpenAPI/Swagger definitions.
 - Technology: Swashbuckle.AspNetCore and NSwag for client/server contract validation.

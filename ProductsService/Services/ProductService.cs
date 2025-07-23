@@ -16,7 +16,8 @@ public class ProductService
     private static readonly List<Product> _products = new()
     {
         new Product { Id = "p001", Name = "Wireless Mouse", StockCount = 0 },
-        new Product { Id = "p002", Name = "Mechanical Keyboard", StockCount = 20 }
+        new Product { Id = "p002", Name = "Mechanical Keyboard", StockCount = 20 },
+        new Product { Id = "p003", Name = "Webcam", StockCount = 0 }
     };
 
     public IEnumerable<Product> GetAll()
