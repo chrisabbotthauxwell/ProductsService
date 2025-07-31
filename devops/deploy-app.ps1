@@ -57,15 +57,7 @@ if ([string]::IsNullOrEmpty($existingApp)) {
     az containerapp update `
       --name $PRODUCTSSERVICE_APP_NAME `
       --resource-group $RESOURCE_GROUP `
-      --image $PRODUCTSSERVICE_IMAGE_NAME `
-      --registry-server $ACR_REGISTRY_SERVER `
-      --registry-username $ACR_USERNAME `
-      --registry-password $ACR_PASSWORD `
-      --cpu 0.25 `
-      --memory 0.5Gi `
-      --min-replicas 1 `
-      --max-replicas 1 `
-      --env-vars APPLICATIONINSIGHTS_CONNECTION_STRING=$APP_INSIGHTS_CONNECTION_STRING
+      --image $PRODUCTSSERVICE_IMAGE_NAME
 }
 
 # Check if the OrdersService container app exists
@@ -97,13 +89,5 @@ if ([string]::IsNullOrEmpty($existingApp)) {
     az containerapp update `
       --name $ORDERSSERVICE_APP_NAME `
       --resource-group $RESOURCE_GROUP `
-      --image $ORDERSSERVICE_IMAGE_NAME `
-      --registry-server $ACR_REGISTRY_SERVER `
-      --registry-username $ACR_USERNAME `
-      --registry-password $ACR_PASSWORD `
-      --cpu 0.25 `
-      --memory 0.5Gi `
-      --min-replicas 1 `
-      --max-replicas 1 `
-      --env-vars APPLICATIONINSIGHTS_CONNECTION_STRING=$APP_INSIGHTS_CONNECTION_STRING
+      --image $ORDERSSERVICE_IMAGE_NAME
 }

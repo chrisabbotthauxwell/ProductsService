@@ -54,6 +54,7 @@
 - [x] Update infrastructure script to create Service Bus topics for all event topics
 - [x] Create script to deploy containerised OrdersService + Dapr sidecar
 - [x] Enable distributed tracing
+- [x] Enable Dapr resilliency policies
 
 ## Testing
 - [x] Unit testing (xUnit)

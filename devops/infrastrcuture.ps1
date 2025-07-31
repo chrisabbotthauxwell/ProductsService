@@ -169,6 +169,7 @@ for ($i = 0; $i -lt $yaml.Count; $i++) {
 }
 $yaml | Set-Content $pubsubPath
 
+# Create or update Dapr component for pubsub
 Write-Host "Creating Dapr component $DAPR_COMPONENT_NAME."
 az containerapp env dapr-component set --name $ENV_NAME --resource-group $RESOURCE_GROUP --dapr-component-name $DAPR_COMPONENT_NAME --yaml $pubsubPath
 
@@ -185,3 +186,9 @@ for ($i = 0; $i -lt $yaml.Count; $i++) {
     }
 }
 $yaml | Set-Content $pubsubPath
+
+# Create Dapr resiliency policy
+Write-Host "Creating Dapr resiliency policy for $DAPR_COMPONENT_NAME."
+$pubsubResiliencyPolicyPath = "components/azure/pubsub-resiliency-policy.yaml"
+az containerapp env dapr-component resiliency create --resource-group $RESOURCE_GROUP --name $DAPR_COMPONENT_PUBSUB_RESILIENCY_POLICY_NAME --environment $ENV_NAME --dapr-component-name $DAPR_COMPONENT_NAME --yaml $pubsubResiliencyPolicyPath
+Write-Host "Dapr resiliency policy for $DAPR_COMPONENT_NAME created."

@@ -1,0 +1,22 @@
+outboundPolicy:
+  httpRetryPolicy:
+    maxRetries: 5
+    retryBackOff:
+      initialDelayInMilliseconds: 1000
+      maxIntervalInMilliseconds: 10000
+  timeoutPolicy:
+    responseTimeoutInSeconds: 15
+  circuitBreakerPolicy:
+    intervalInSeconds: 15
+    consecutiveErrors: 10
+    timeoutInSeconds: 5
+inboundPolicy:
+  httpRetryPolicy:
+    maxRetries: 3
+    retryBackOff:
+      initialDelayInMilliseconds: 500
+      maxIntervalInMilliseconds: 5000
+  circuitBreakerPolicy:
+    intervalInSeconds: 15
+    consecutiveErrors: 10
+    timeoutInSeconds: 5

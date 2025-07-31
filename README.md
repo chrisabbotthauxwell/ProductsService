@@ -224,7 +224,7 @@ A customer order can be in one of three states:
 |Order status|Description|
 |--|--|
 |`placed`|The order has been placed and is being processed by the system|
-|`fulfilled`|Stock is available to fulfil the order|
+|`fulfilled`|Stock was available to fulfil the order and the order was fulfilled.|
 |`pending`|Stock is not available to fulfil the order, the order is pending stock availability before fulfilment|
 
 ### Service endpoints
@@ -284,8 +284,8 @@ Returns all Order objects as JSON
 ```
 Creates a new order detailing the ordered product and the quanitity ordered.
 
-## Running locally
-### Local ProductsService + Dapr sidecar + Dapr Redis
+## Running locally as HTTP services
+### 1. Local ProductsService + Dapr sidecar + Dapr Redis
 1. `components/local/` > `pubsub.yaml` > `redisHost` value set to `localhost:6379`
 ```yml
   metadata:
@@ -303,7 +303,7 @@ dapr run --app-id productsserrvice --resources-path ../components/local/ --app-p
 4. Open project at `http://localhost:8080/swagger`
 5. Attach debugger from CTRL+SHIFT+P > "Debug: Attach to .NET CORE process" if required.
 
-### Local OrdersService + Dapr sidecar + Dapr redis
+### 2. Local OrdersService + Dapr sidecar + Dapr redis
 1. `components/local/` > `pubsub.yaml` > `redisHost` value set to `localhost:6379`
 ```yml
   metadata:
@@ -321,6 +321,7 @@ dapr run --app-id ordersservice --resources-path ../components/local/ --app-port
 4. Open project at `http://localhost:8081/swagger`
 5. Attach debugger from CTRL+SHIFT+P > "Debug: Attach to .NET CORE process" if required.
 
+## Running locally with Docker Compose
 ### Containerised ProductsService + OrdersService + Dapr sidecars + Compose Redis
 1. `components/local/` > `pubsub.yaml` > `redisHost` value set to `redis:6379`
 ```yml
@@ -346,17 +347,17 @@ Dual-mode logging strategy for local debugging and deployment to Azure Container
 - Simple logging implemented. More complex logging could be implemented using [Serilog](https://serilog.net/)
 
 ### Logging for local development
-
 - Console sink only.
 - Debug level logging for visibility of all levels of log output.
-- Fast, visible, and file-persistent logs with no cloud dependency.
+- Fast, visible console logs with no cloud dependency.
 
 ### Logging for Azure deployments
 - Console sink only.
 - Information level logging.
-- Centralized, queryable logs with correlation across services using Dapr Observability, Application Insights, and Azure Monitor for both logs and distributed tracing.
-- Dapr sidecars in ACA automatically export logs, metrics, and traces to Azure Monitor/App Insights.
-- For distributed tracing, logs should correlation IDs or trace context. This is supported by default when using Dapr and App Insights. No extra code is needed, console output must be JSON.
+- Centralized, queryable logs with correlation across services using Dapr Observability, with distributed logs, metrics and tracing sent to Open Telemetry endpoints for analysis using Application Insights and Azure Monitor.
+  - `Azure.Monitor.OpenTelemetry.AspNetCore` enabled in application code
+  - Open Telemetry enabled in Container App Environment
+  - Distributed traces visible in Application Insights > Logs >`traces` 
 
 ## Code changes
 Trunk based development -> Commit changes to `main` and push to origin
